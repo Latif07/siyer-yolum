@@ -31,7 +31,10 @@
   const IK = d => `<svg class="ik" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
   const IKON = {
     ay: IK('<path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/>'),
-    bugun: IK('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'),
+    bugun: IK('<rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/>'),
+    degis: IK('<path d="M7 7h11l-3-3M17 17H6l3 3"/>'),
+    geri: IK('<path d="M15 5l-7 7 7 7"/>'),
+    sil: IK('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>'),
     yol: IK('<circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M6 17c0-7 12-4 12-10"/>'),
     sinav: IK('<path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/>'),
     ben: IK('<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>'),
@@ -43,7 +46,7 @@
     cocuk: IK('<circle cx="12" cy="9" r="5"/><path d="M9.5 9h.01M14.5 9h.01M10 11.5c1 1 3 1 4 0"/><path d="M7 21c1-3 3-4 5-4s4 1 5 4"/>'),
     ilerleme: IK('<path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/>')
   };
-  const EMOJI = { bugun: '☀️', yol: '🗺️', sinav: '🎯', ben: '🙂', tik: '✅', ileri: '➡️', video: '🎬', harita: '📍', kitap: '📖', ay: '🌙', ilerleme: '📊', cocuk: '🧒' };
+  const EMOJI = { bugun: '📅', yol: '🗺️', sinav: '🎯', ben: '🙂', harita: '📍', kitap: '📖', ilerleme: '📊', cocuk: '🧒' };
   const ik = ad => cocuk() && EMOJI[ad] && ad !== 'ay' ? `<span class="ik" aria-hidden="true" style="font-size:1.35rem;line-height:1">${EMOJI[ad]}</span>` : IKON[ad];
 
   // ------------------------------------------------------------ yönlendirme (Kur'an Yolum'daki ekran yığını)
@@ -62,8 +65,8 @@
   }
   function toast(m) { document.querySelectorAll('.toast').forEach(x => x.remove()); const d = document.createElement('div'); d.className = 'toast'; d.setAttribute('role', 'status'); d.textContent = m; document.body.appendChild(d); setTimeout(() => d.remove(), 2600); }
 
-  const ust = (baslik, geriVar, sag) => `<header class="ust">${geriVar ? `<button class="geri" data-geri aria-label="Geri">‹</button>` : `<span class="logo">${IKON.ay}</span>`}<h1>${esc(baslik)}</h1>${sag || ''}</header>`;
-  const modDugme = () => `<button class="sag" data-mod aria-label="${cocuk() ? 'Büyük moduna geç' : 'Çocuk moduna geç'}">${ik('cocuk')}<span>${cocuk() ? 'Çocuk' : 'Büyük'}</span></button>`;
+  const ust = (baslik, geriVar, sag) => `<header class="ust">${geriVar ? `<button class="geri" data-geri aria-label="Geri">${IKON.geri}</button>` : `<span class="logo">${IKON.ay}</span>`}<h1>${esc(baslik)}</h1>${sag || ''}</header>`;
+  const modDugme = () => `<button class="sag" data-mod aria-label="Mod: şu an ${cocuk() ? 'çocuk' : 'büyük'}. Değiştirmek için dokun">${IKON.degis}<span>${cocuk() ? 'Çocuk' : 'Büyük'}</span></button>`;
   function modBagla() { const b = $('[data-mod]'); if (b) b.onclick = () => { S.mod = cocuk() ? 'buyuk' : 'cocuk'; kaydet(); ciz(); toast(cocuk() ? 'Çocuk modu' : 'Büyük modu'); }; }
 
   // ------------------------------------------------------------ alt sekme çubuğu
@@ -89,16 +92,16 @@
     const u = Math.max((mx(lons) - mn(lons)) * 0.9 * 1.5 / 4, (mx(lats) - mn(lats)) * 1.5 / 3, 0.9), sc = 320 / (4 * u);
     const X = lo => 160 + (lo - cLon) * 0.9 * sc, Y = la => 120 - (la - cLat) * sc, pt = (la, lo) => X(lo).toFixed(1) + ',' + Y(la).toFixed(1);
     const fs = cocuk() ? 14 : 11;
-    let g = '<svg viewBox="0 0 320 240" role="img" aria-label="Şematik harita"><rect width="320" height="240" fill="var(--deniz)"/>';
+    let g = '<svg viewBox="0 0 320 240" role="img" aria-label="Şematik harita"><defs><marker id="ok" viewBox="0 0 10 10" refX="14" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs><rect width="320" height="240" fill="var(--deniz)"/>';
     KARA.forEach(a => g += `<polygon points="${a.map(v => pt(v[0], v[1])).join(' ')}" fill="var(--kara)" stroke="var(--kiyi)" stroke-width="1.2"/>`);
     const sx = X(38.6), sy = Y(20.2);
     if (sx > 30 && sx < 290 && sy > 20 && sy < 220) g += `<text x="${sx}" y="${sy}" text-anchor="middle" font-size="10" font-style="italic" fill="var(--soluk)" transform="rotate(-35 ${sx} ${sy})">Kızıldeniz</text>`;
-    if (H.yol) g += `<polyline points="${H.yol.map(k => pt(YERLER[k].lat, YERLER[k].lon)).join(' ')}" fill="none" stroke="var(--renk)" stroke-width="2.5" stroke-dasharray="6 4" stroke-linecap="round"/>`;
+    if (H.yol) g += `<polyline points="${H.yol.map(k => pt(YERLER[k].lat, YERLER[k].lon)).join(' ')}" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="6 4" stroke-linecap="round" marker-end="url(#ok)"/>`;
     P.forEach(p => {
       const x = X(p.lon), y = Y(p.lat), sol = x > 220;
-      g += `<circle cx="${x}" cy="${y}" r="${cocuk() ? 9 : 5}" fill="var(--renk)" stroke="#fff" stroke-width="2"/>`;
+      g += `<circle cx="${x}" cy="${y}"  r="${cocuk() ? 9 : 5}" fill="currentColor" stroke="#fff" stroke-width="2"/>`;
       if (cocuk()) g += `<text x="${x}" y="${y + 4.5}" text-anchor="middle" font-size="11">${p.e}</text>`;
-      g += `<text x="${x + (sol ? -13 : 13)}" y="${y + 4}" text-anchor="${sol ? 'end' : 'start'}" font-size="${fs}" font-weight="bold" fill="var(--metin)" stroke="var(--kara)" stroke-width="3" paint-order="stroke">${esc(p.ad)}</text>`;
+      g += `<text x="${x + (sol ? -13 : 13)}" y="${y + 4}" text-anchor="${sol ? 'end' : 'start'}" font-size="${fs}" font-weight="bold" fill="var(--metin)" stroke="var(--kara)" stroke-width="4" paint-order="stroke">${esc(p.ad)}</text>`;
     });
     return `<figure class="harita" style="margin:14px 0">${g}</svg><figcaption>Şematik harita, ölçekli değildir.</figcaption></figure>`;
   }
@@ -180,7 +183,7 @@
     const q = Q.S[Q.k];
     app.innerHTML = `${ust(Q.baslik || (ders_ && ders_.x.baslik) || 'Sınav', true)}<main style="--renk:${renk}">
       <p class="sorusay">Soru ${Q.k + 1} / ${Q.S.length}</p><div class="ilerle"><i style="width:${Q.k / Q.S.length * 100}%"></i></div>
-      <h2 class="ders-baslik" style="font-size:1.25rem">${esc(q.s)}</h2><div id="sec"></div><p class="soluk" id="ac" aria-live="polite"></p><div id="dev"></div></main>`;
+      <h2 class="ders-baslik" style="font-size:1.25rem">${esc(q.s)}</h2><div id="sec"></div><p class="soluk" id="ac" role="status" aria-live="polite"></p><div id="dev"></div></main>`;
     // seçenek sırası her seferinde karışır; doğru cevap sırası ezberlenmesin
     const sira = karistir(q.sec.map((s, i) => i));
     sira.forEach(i => { const b = document.createElement('button'); b.className = 'sik'; b.textContent = q.sec[i];
@@ -227,7 +230,7 @@
       <div class="secim" role="group" aria-label="Tema"><button data-t="oto" class="${S.tema === 'oto' ? 'on' : ''}">Otomatik</button><button data-t="acik" class="${S.tema === 'acik' ? 'on' : ''}">Açık</button><button data-t="koyu" class="${S.tema === 'koyu' ? 'on' : ''}">Koyu</button></div>
       <p class="baslik">Uygulama</p>
       <div class="bolumler"><button class="bolum" data-git="ilerleme"><span class="ikon">${ik('ilerleme')}</span><span class="bad">İlerleme<small>Dönemler ve sınav sonuçları</small></span><span class="ok">›</span></button>
-      <button class="bolum" id="sifirla"><span class="bad">${sifirlaOnay ? 'Emin misin? Tekrar dokun' : 'İlerlemeyi sıfırla'}<small>${sifirlaOnay ? 'Tüm dersler ve sınav sonuçları silinir' : 'Dersler ve sınav sonuçları silinir'}</small></span></button></div>
+      <button class="bolum tehlike" id="sifirla"><span class="ikon" style="color:var(--kotu)">${IKON.sil}</span><span class="bad">${sifirlaOnay ? 'Emin misin? Tekrar dokun' : 'İlerlemeyi sıfırla'}<small>${sifirlaOnay ? 'Tüm dersler ve sınav sonuçları silinir' : 'Dersler ve sınav sonuçları silinir'}</small></span></button></div>
       <p class="soluk kucukyazi" style="margin-top:18px">İçerik taslaktır: tarihler TDV İslâm Ansiklopedisi «Muhammed» maddesi ve kronolojisiyle karşılaştırılmıştır; yayın öncesi Diyanet yayınlarıyla da doğrulanmalıdır.</p>
       <p class="soluk kucukyazi">Siyer Yolum ${esc(SURUM_BILGI.SURUM)}</p></main>`;
     app.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { S.mod = b.dataset.m; kaydet(); ciz(); });
