@@ -48,6 +48,7 @@ body[data-mod=cocuk] .olay b::before{content:attr(data-e) " "}
 .sik{display:block;width:100%;text-align:left;background:var(--kart);border:2px solid var(--cizgi);border-radius:var(--r);padding:12px;margin:8px 0}
 .sik.dogru{border-color:#2e9d5b;background:#e5f6ec}.sik.yanlis{border-color:#d34a4a;background:#fbe8e8}
 .aciklama{color:var(--soluk);font-size:.9em;margin:6px 0}
+.sinavlar{display:grid;gap:10px;margin-top:12px}.sinav{display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left;background:var(--kart);border:2px solid var(--vurgu);border-radius:var(--r);padding:12px 14px}.sinav em{font-style:normal;color:var(--soluk);font-size:.8em}
 .yakinda-not{text-align:center;color:var(--soluk);padding:40px 0}
 </style>
 </head>
@@ -78,7 +79,12 @@ function ana(){
     d.dersler.forEach(x=>{no++;const var_=!!x.cocuk;
       h+=`<div class="dugum ${biten[x.id]?'bitti':''} ${var_?'':'yakinda'}"><button data-d="${d.id}" data-i="${x.id}"><span class="no"><span>${no}</span></span><span class="t">${esc(x.baslik)}<em>${x.yil}${var_?'':' · yakında'}</em></span></button></div>`});
     h+='</div></section>'});
+  h+=`<section class="donem" style="--renk:#1f6f5c"><h2>${mod==='cocuk'?'🎯 Sınavlar':'Bölüm Sınavları'}<small>Soruları ilgili derslerden gelir</small></h2><div class="sinavlar">`;
+  SINAVLAR.forEach(z=>{const n=soruHavuzu(z).length,en=biten[z.id];
+    h+=`<button class="sinav" data-z="${z.id}"><span>${esc(z.ad)}</span><em>${n} soru${en!=null?' · en iyi '+en:''}</em></button>`});
+  h+='</div></section>';
   $('#ana').innerHTML=h;
+  document.querySelectorAll('.sinav').forEach(b=>b.onclick=()=>bolumSinavi(SINAVLAR.find(z=>z.id===b.dataset.z)));
   document.querySelectorAll('.dugum button').forEach(b=>b.onclick=()=>{
     const d=DONEMLER.find(x=>x.id===b.dataset.d);ders(d,d.dersler.find(x=>x.id===b.dataset.i))});
 }
@@ -93,24 +99,30 @@ function ders(d,x){
   h+=`<div class="ozet">${esc(v.ozet)}</div><div class="zaman">`;
   v.olaylar.forEach(o=>h+=`<div class="olay"><b data-e="${o.e||''}">${esc(o.b)}</b>${esc(o.m)}${o.k?`<div class="kaynak">Kaynak: ${esc(o.k)}</div>`:''}</div>`);
   h+=`</div><button class="btn" id="soru">${mod==='cocuk'?'🎯 Hadi soruları çözelim!':'Kısa sınav'}</button>`;
-  i.innerHTML=h;$('#geri').onclick=kapat;$('#soru').onclick=()=>quiz(x,0,0);
+  i.innerHTML=h;$('#geri').onclick=kapat;$('#soru').onclick=()=>quiz(x.sorular,0,0,x.id,()=>ders(aktif.d,x));
 }
 function kapat(){$('#ders').classList.remove('ac');ana()}
 
-function quiz(x,k,puan){
-  const i=$('#ic'),S=x.sorular;
+function soruHavuzu(z){return DONEMLER.filter(d=>z.donemler.includes(d.id)).flatMap(d=>d.dersler).flatMap(x=>x.sorular||[])}
+function karistir(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function bolumSinavi(z){
+  const el=$('#ders');el.style.setProperty('--renk','#1f6f5c');el.classList.add('ac');el.scrollTop=0;
+  quiz(karistir(soruHavuzu(z)).slice(0,10),0,0,z.id,kapat,z.ad);
+}
+function quiz(S,k,puan,anahtar,geri,baslik){
+  const i=$('#ic');
   if(k>=S.length){
-    biten[x.id]=1;kaydet();
-    i.innerHTML=`<button class="geri" id="geri">← Yola dön</button><div class="yakinda-not" style="color:var(--yazi)"><div style="font-size:3em">${mod==='cocuk'?'🏆':'✓'}</div><h3>${puan} / ${S.length} doğru</h3><p>${mod==='cocuk'?'Aferin! Ders tamamlandı.':'Ders tamamlandı.'}</p></div>`;
+    biten[anahtar]=anahtar.startsWith('s-')?Math.max(biten[anahtar]||0,puan):1;kaydet();
+    i.innerHTML=`<button class="geri" id="geri">← Yola dön</button><div class="yakinda-not" style="color:var(--yazi)"><div style="font-size:3em">${mod==='cocuk'?'🏆':'✓'}</div><h3>${puan} / ${S.length} doğru</h3><p>${mod==='cocuk'?'Aferin!':'Tamamlandı.'}</p></div>`;
     $('#geri').onclick=kapat;return}
   const q=S[k];
-  i.innerHTML=`<button class="geri" id="geri">← Derse dön</button><p><small>Soru ${k+1}/${S.length}</small></p><h3>${esc(q.s)}</h3><div id="sec"></div><div class="aciklama" id="ac"></div>`;
-  $('#geri').onclick=()=>ders(aktif.d,x);
+  i.innerHTML=`<button class="geri" id="geri">← ${baslik?'Yola dön':'Derse dön'}</button><p><small>${baslik?esc(baslik)+' · ':''}Soru ${k+1}/${S.length}</small></p><h3>${esc(q.s)}</h3><div id="sec"></div><div class="aciklama" id="ac"></div>`;
+  $('#geri').onclick=geri;
   q.sec.forEach((s,j)=>{const b=document.createElement('button');b.className='sik';b.textContent=s;
-    b.onclick=()=>{const kutular=[...document.querySelectorAll('.sik')];kutular.forEach((e,n)=>{e.disabled=true;if(n===q.d)e.classList.add('dogru')});
+    b.onclick=()=>{[...document.querySelectorAll('.sik')].forEach((e,n)=>{e.disabled=true;if(n===q.d)e.classList.add('dogru')});
       if(j!==q.d)b.classList.add('yanlis');
       $('#ac').textContent=q.a;const ok=j===q.d?1:0;
-      const n=document.createElement('button');n.className='btn';n.textContent='Devam';n.onclick=()=>quiz(x,k+1,puan+ok);$('#ac').after(n)};
+      const n=document.createElement('button');n.className='btn';n.textContent='Devam';n.onclick=()=>quiz(S,k+1,puan+ok,anahtar,geri,baslik);$('#ac').after(n)};
     $('#sec').append(b)});
 }
 modUygula();ana();
