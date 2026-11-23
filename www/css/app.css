@@ -122,3 +122,9 @@ body[data-mod="cocuk"] .dugum .no { width: 44px; height: 44px; font-size: 1.1rem
 .detay summary { min-height: 44px; }
 .harita svg { color: color-mix(in srgb, var(--renk, var(--ana)) calc(100% - var(--acik)), #fff); }
 .bolum.tehlike .bad { color: var(--kotu); }
+
+.kaynak-kart { border: 1px solid var(--cizgi); border-radius: 12px; padding: 12px; margin: 8px 0; }
+.kaynak-kart b { display: block; line-height: 1.3; } .kaynak-kart small { color: var(--soluk); }
+.kaynak-btn { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.kaynak-btn .video { margin: 0; flex: 1 1 100%; }
+.lnk { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 14px; border: 1.5px solid var(--ana); border-radius: 99px; color: var(--ana); text-decoration: none; font-size: .9rem; font-weight: 600; }

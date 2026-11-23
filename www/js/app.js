@@ -5,8 +5,7 @@
   const app = document.getElementById('app');
   const $ = s => app.querySelector(s);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const DIA_URL = 'https://islamansiklopedisi.org.tr/muhammed#19-hz-peygamber-devri-kronolojisi';
-
+  
   // ------------------------------------------------------------ durum (telefonda saklanır)
   const ANAHTAR = 'siyer-yolum.v1';
   const S = { mod: 'buyuk', tema: 'oto', biten: {}, sinav: {}, seri: { gun: 0, son: '' } };
@@ -145,10 +144,11 @@
       <span class="chip">${esc(x.yil)}</span><h2 class="ders-baslik">${esc(x.baslik)}</h2>
       <div class="ozet">${esc(v.ozet)}</div>${harita(id)}
       <div class="zaman">${v.olaylar.map(o => `<div class="olay"><b>${o.e ? `<span aria-hidden="true">${o.e}</span>` : ''}${esc(o.b)}</b>${esc(o.m)}${o.k ? `<div class="kaynak">Kaynak: ${esc(o.k)}</div>` : ''}</div>`).join('')}</div>
-      <details class="detay"><summary>${ik('kitap')} ${cocuk() ? 'Daha çok öğren' : 'Daha fazla bilgi'}</summary>
-        ${(dt.metin || []).map(m => `<p>${esc(m)}</p>`).join('') || '<p class="soluk">Bu ders için geniş anlatım ve video daha sonra eklenecek.</p>'}
-        ${dt.video ? `<a class="video" href="${esc(dt.video.url)}" target="_blank" rel="noopener">${ik('video')} ${esc(dt.video.baslik)}</a>` : ''}
-        <p class="soluk kucukyazi">Kaynak: <a href="${DIA_URL}" target="_blank" rel="noopener">DİA, Muhammed maddesi</a> · <a href="https://siyervakfi.org/siyer/" target="_blank" rel="noopener">Siyer Vakfı</a></p></details>
+      <details class="detay" ${cocuk() ? '' : 'open'}><summary>${ik('kitap')} ${cocuk() ? 'Daha çok öğren' : 'Daha fazla bilgi'}</summary>
+        ${(dt.metin || []).map(m => `<p>${esc(m)}</p>`).join('') || '<p class="soluk">Bu ders için ayrıntılı anlatım daha sonra eklenecek.</p>'}
+        ${(dt.sv || []).length ? `<p class="baslik" style="margin:16px 0 8px">Siyer Vakfı dersleri</p>${dt.sv.map(v => `<div class="kaynak-kart"><b>${esc(v.baslik)}</b><small>${esc(v.kisi)}</small><div class="kaynak-btn">${v.video ? `<a class="video" href="${esc(v.video)}" target="_blank" rel="noopener">${ik('video')} Videoyu izle</a>` : ''}<a class="lnk" href="${esc(v.sayfa)}" target="_blank" rel="noopener">Ders sayfası</a>${v.pdf ? `<a class="lnk" href="${esc(v.pdf)}" target="_blank" rel="noopener">Ders notu (PDF)</a>` : ''}</div></div>`).join('')}` : ''}
+        ${(dt.dia || []).length ? `<p class="baslik" style="margin:16px 0 8px">TDV İslâm Ansiklopedisi maddeleri</p><div class="kaynak-btn">${dt.dia.map(d => `<a class="lnk" href="${esc(d.url)}" target="_blank" rel="noopener">${esc(d.ad)}</a>`).join('')}</div>` : ''}
+      </details>
       <button class="btn" id="ileri">${sn ? 'İleri' : 'Bitir'} ${ik('ileri')}</button>
       <button class="btn ikincil" id="soru">${cocuk() ? 'Soruları çözelim' : 'Kısa soruları çöz'}</button></main>`;
     // İleri: soruları beklemeden bir sonraki derse geçer (ders okunmuş sayılır); sorular isteğe bağlı

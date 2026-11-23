@@ -359,15 +359,167 @@ const KARA=[
 ];
 
 /* ===== DAHA FAZLA BİLGİ =====
- DETAY[dersId]={metin:['paragraf',...], video:{baslik:'...',url:'https://...'}}
- Video bağlantısı yalnızca gerçek ve doğrulanmış adresle eklenmeli. Şimdilik iki örnek metin var. */
+ Her ders için konuya özel ayrıntı: metin (DİA maddelerinden kendi cümlelerimizle), dia (DİA'nın o konudaki maddesi),
+ sv (Siyer Vakfı'nın o konudaki ders sayfası, videosu ve PDF ders notu). Bağlantılar tek tek açılıp doğrulandı (23.11.2026).
+ DIA(madde-adresi, ad) · SV(sayfa-adresi, youtube-kimliği, ders başlığı, anlatıcı, pdf) */
+const DIA=(slug,ad)=>({ad,url:'https://islamansiklopedisi.org.tr/'+slug});
+const SV=(slug,yt,baslik,kisi,pdf)=>({baslik,kisi,sayfa:'https://siyervakfi.org/'+slug+'/',video:yt?'https://www.youtube.com/watch?v='+yt:'',pdf:pdf||''});
+const KM='https://siyervakfi.org/dokuman/kuran-cografyasi-mekke/', IM='https://siyervakfi.org/dokuman/iman-sehri-medine/';
+const SV_APAYDIN=SV('dr-mehmet-apaydin-kutlu-dogumdan-hicrete-mekke-doneminin-kronolojisi','fQROakFQ7ko','Kutlu Doğumdan Hicrete Mekke Dönemi’nin Kronolojisi','Dr. Mehmet Apaydın',KM+'ders2-dr-mehmet-apaydin.pdf');
+const SV_MEDINE_KRON=SV('medine-donemi-kronolojisi-mehmet-apaydin','iu61yP37Wl8','Medine Dönemi Kronolojisi','Mehmet Apaydın',IM+'ders-3-mehmet-apaydin.pdf');
+const SV_SAVAS=SV('amac-ve-hedefleri-acisindan-hz-peygamberin-savaslari-prof-dr-kasim-sulul','ZvTYSonZsZ8','Amaç ve Hedefleri Açısından Hz. Peygamber’in Savaşları','Prof. Dr. Kâsım Şulul',IM+'ders-8-prof-dr-kasim-sulul.pdf');
+const SV_APAK=SV('prof-dr-adem-apak-yeni-arayislar-huzun-yilindan-taife-taiften-akabe-gorusmelerine','Dh8ljyajrU0','Yeni Arayışlar (Hüzün Yılından Tâif’e, Tâif’ten Akabe Görüşmelerine)','Prof. Dr. Adem Apak');
 const DETAY={
  fil:{metin:[
-  'Genel kabul gören kanaate göre Hz. Muhammed, Fil Vak‘ası’ndan elli (veya elli beş) gün sonra Rebîülevvel’in 12’sinde Pazartesi günü doğdu.',
-  'Miladi tarih için iki görüş vardır. Astronomi âlimi Mahmûd Paşa el-Felekî, oğlu İbrâhim’in vefatı sırasındaki güneş tutulmasından hareketle doğumu 9 Rebîülevvel / 20 Nisan 571 olarak hesaplamıştır. DİA’nın kronoloji tablosu ise 17 Haziran 569’u esas alır.',
-  'Kaynaklarda hicretten önceki bazı olaylar Peygamber’in yaşına göre tarihlendirildiği için, bu olayların miladi yılları doğum yılına göre değişebilir.']},
+  'Fil Vak‘ası’nın sebebi, tarihi ve sonucu hakkında kaynaklarda değişik rivayetler vardır. Olayın kahramanı Ebrehe, Habeş Krallığı’nın Yemen valisi ve mutaassıp bir hıristiyandı. Araplar’ın Kâbe’yi ziyaret için Mekke’ye gittiğini görünce San‘a’da büyük bir katedral yaptırdı; bunun amacı insanları oraya çekmekti.',
+  'Kur’an’ın 105. sûresinde ordu mensuplarından “ashâbü’l-fîl” diye söz edilir. Askerin önünde bir fil bulunduğu için hem sûreye hem olaya “Fil” denmiştir.',
+  'Genel kabul gören kanaate göre Hz. Muhammed, bu olaydan elli (veya elli beş) gün sonra Rebîülevvel’in 12’sinde Pazartesi günü Mekke’de doğdu. Miladi tarih için DİA iki hesabı birlikte verir: 20 Nisan 571 ve 17 Haziran 569.']
+  ,dia:[DIA('fil-vakasi','Fil Vak‘ası'),DIA('ebrehe','Ebrehe')],
+  sv:[SV('prof-dr-huseyin-algul-hz-peygamberin-sas-dogumu-ve-dogumunda-meydana-geldigi-rivayet-edilen-hadiseler','p4fqNOt9wQ8','Hz. Peygamber’in (sas) Doğumu ve Doğumunda Meydana Geldiği Rivayet Edilen Hadiseler','Prof. Dr. Hüseyin Algül',KM+'ders4-prof-dr-huseyin-algul.pdf'),SV_APAYDIN]},
+ sut:{metin:[
+  'Mekkeli aileler çocuklarını, çölün sağlıklı havasında büyüsünler ve fasih Arapça öğrensinler diye bedevî kabilelerden bir sütanneye verirdi. Sütanneliği gelir kaynağı olan kadınlar zengin ailelerin çocuklarını tercih ederdi.',
+  'Halîme, Hevâzin kabilesinin Sa‘d b. Bekir koluna mensuptu. Kıtlık yılında Mekke’ye geldiğinde zengin bir aile çocuğu bulamadı; yetim olduğu için Muhammed’i almakta tereddüt etti, ama boş dönmemek için kabul etti.',
+  'İki yıl sonra Halîme çocuğu sütten kesip ailesine getirdi. Âmine, çöl havasının çocuğa yaradığını görünce (bir rivayete göre Mekke’de veba çıktığı için) onu bir süre daha geri gönderdi. Hz. Muhammed beş yaşına gelince Halîme onu ailesine teslim etti.']
+  ,dia:[DIA('halime','Halîme')],
+  sv:[SV('prof-dr-kasim-sulul-hz-peygamberin-cocuklugu-sutanneye-verilisi-ve-serhus-sadr-hadisesi','MB_-fqyC22k','Hz. Peygamber’in Çocukluğu, Sütanneye Verilişi ve Şerhu’s-Sadr Hadisesi','Prof. Dr. Kâsım Şulul',KM+'ders5-prof-dr-kasim-sulul.pdf')]},
+ amine:{metin:[
+  'Âmine, Kureyş’in Benî Zühre koluna mensup Vehb b. Abdümenâf’ın kızıdır. Oğluyla birlikte Yesrib’deki akrabalarını ziyaret etti; orada bir ay kadar kaldıktan sonra dönüşte, Medine’ye yaklaşık 190 km uzaklıktaki Ebvâ’da hastalanıp vefat etti. Dadısı Ümmü Eymen çocuğu Mekke’ye götürüp dedesi Abdülmuttalib’e teslim etti.',
+  'Abdülmuttalib’in asıl adı Şeybe’dir; Yesrib’de doğdu. Mekke’ye amcası Muttalib’le gelince onu köle sanan Mekkeliler “Abdülmuttalib” dedi ve ad ona kaldı. Zemzem Kuyusu’nu yeniden buldu, hacılara su dağıtma görevini üstlendi. Torununa çok ihtimam gösterdi, Dârünnedve toplantılarına yanında götürdü.',
+  'Abdülmuttalib vefat etmeden önce sekiz yaşındaki torununun bakımını Ebû Tâlib’e vasiyet etti. Ebû Tâlib, Abdullah’ın öz kardeşiydi ve Hâşimoğulları’nın reisliği ölümüne kadar onda kaldı.']
+  ,dia:[DIA('amine','Âmine'),DIA('abdulmuttalib','Abdülmuttalib'),DIA('ebu-talib','Ebû Tâlib'),DIA('ebva','Ebvâ')],sv:[SV_APAYDIN]},
+ sam:{metin:[
+  'Mekkelilerin ticaret yolları Suriye ve Yemen’e uzanırdı. Hz. Muhammed’in sonraki yıllarda Hubâşe panayırına, bir veya iki defa Yemen’e, Doğu Arabistan’daki panayırlara ve Habeşistan’a gittiği bilinir; bu seferler ona insanları, dilleri ve adetleri tanıma imkânı verdi.',
+  'Busrâ, Suriye’nin güneyinde, Yermük nehrinin kaynağına yakın, Şam’ın yaklaşık 141 km güneyinde eski bir şehirdir; Mekke kervanlarının uğrak yeriydi. Çocukken amcası Ebû Tâlib’le Suriye’ye yaptığı yolculukta rahip Bahîra ile karşılaştığı rivayeti, kaynaklarda farklı ayrıntılarla anlatılır ve ilim çevrelerinde ayrıca tartışılır.']
+  ,dia:[DIA('busra','Busrâ'),DIA('bahira','Bahîrâ')],
+  sv:[SV('prof-dr-mustafa-fayda-rahib-bahira-hadisesi','OtJq7myIWrs','Rahib Bahira Hadisesi','Prof. Dr. Mustafa Fayda',KM+'ders7-prof-dr-mustafa-fayda.pdf'),SV('mehmet-kaya-hz-peygamberin-nubuvvet-oncesi-ticari-seferleri','PQq0VaaAW2Y','Hz. Peygamber’in Nübüvvet Öncesi Ticari Seferleri','Mehmet Kaya',KM+'ders6-prof-dr-ahmet-turan-yuksel.pdf')]},
+ fudul:{metin:[
+  'Ficâr, sözlükte “haktan ayrılmak, günaha dalmak” demektir. Haram aylarda (zilkade, zilhicce, muharrem, receb) yapıldığı için bu adı alan dört savaş vardı. Hz. Muhammed, ilk grubun dördüncüsüne amcalarıyla birlikte katıldı, fakat fiilen savaşmadı. O sıradaki yaşı için 14, 15, 17 ve 20 rivayetleri vardır.',
+  'Bu savaşın hemen ardından Hılfü’l-Fudûl toplantısına katıldı: katılanlar haksızlığa uğrayanları koruyacaklarına yemin etmişti. Hz. Peygamber, peygamber olduktan sonra da bu ittifaktan övgüyle bahsetmiş; böyle bir fazilet antlaşmasına yeniden çağrılsa tereddüt etmeyeceğini söylemiştir.']
+  ,dia:[DIA('ficar','Ficâr')],
+  sv:[SV('doc-dr-mithat-eser-hilful-fudul-cemiyeti','iX1dg9SX2Po','Hılfü’l-Fudûl Cemiyeti','Doç. Dr. Mithat Eser',KM+'ders9-doc-dr-mithat-eser.pdf')]},
+ hatice:{metin:[
+  'Hatice, Mekke’de doğdu; soyu Kusay’da Hz. Peygamber’in soyuyla birleşir. Üstün iffeti sebebiyle İslâm’dan önce “Tâhire” lakabıyla anılırdı. Hz. Muhammed’le evlenmeden önce iki evlilik yapmıştı.',
+  'Kaynaklarda evlilik sırasında kendisinin 25, Hatice’nin 40 yaşında olduğu söylenir; DİA, çocuk sayısını göz önüne alarak İbn Abbas’tan nakledilen 28 yaşı daha isabetli bulur. Hz. Peygamber, hicretten sonra da Hatice’yi vefayla anmıştır.']
+  ,dia:[DIA('hatice','Hatice')],
+  sv:[SV('doc-dr-casim-avci-hz-peygamberin-gencliginden-nubuvvete-kadar-olan-hayati','mFPZNUE6xKg','Hz. Peygamber’in Gençliğinden Nübüvvete Kadar Olan Hayatı','Doç. Dr. Casim Avcı',KM+'ders8-prof-dr-casim-avci.pdf')]},
+ hacer:{metin:[
+  'Hacerülesved, “siyah taş” demektir: yerden yaklaşık 1,5 m yükseklikte, yaklaşık 30 cm çapında, yumurta biçiminde, siyaha yakın koyu kırmızı bir taştır. Kaynaklar, Hz. İbrâhim’in Kâbe’yi inşa ederken tavafın başlangıç noktasını belirlemek için onu yerleştirdiği konusunda görüş birliği içindedir.',
+  'Kureyş Kâbe’yi miladi 605’te yeniden inşa ederken taşı kimin yerine koyacağı konusunda savaşı göze alacak kadar anlaşmazlığa düştü. Ebû Ümeyye b. Mugīre’nin teklifiyle Benî Şeybe Kapısı’ndan ilk girecek kişinin kararına uyulacaktı; giren Hz. Muhammed oldu. Taşı bir örtüye koydu, kabile reisleriyle birlikte kaldırdı ve kendi eliyle yerine yerleştirdi.']
+  ,dia:[DIA('hacerulesved','Hacerülesved')],
+  sv:[SV('doc-dr-casim-avci-hz-peygamberin-gencliginden-nubuvvete-kadar-olan-hayati','mFPZNUE6xKg','Hz. Peygamber’in Gençliğinden Nübüvvete Kadar Olan Hayatı','Doç. Dr. Casim Avcı',KM+'ders8-prof-dr-casim-avci.pdf')]},
+ hira:{metin:[
+  'Hira, Mekke’nin kuzeydoğusunda, Kâbe’ye yaklaşık 5 km uzaklıktadır; Cebelinur (Nur dağı) adıyla da bilinir. Dağ çevresindekilerden daha dik ve yüksektir; ünlü mağara zirvenin yaklaşık 20 m aşağısındadır.',
+  'Peygamberlikten önceki yıllarda Hz. Muhammed Ramazan’da burada inzivaya çekilir, tefekkür ederdi. Vahiy de bu mağarada başladı.']
+  ,dia:[DIA('hira','Hira'),DIA('vahiy','Vahiy')],
+  sv:[SV('prof-dr-omer-celik-peygamberligin-gelisi-nubuvvet-kurumu-ve-vahiy','YxQJgFKjxlY','Peygamberliğin Gelişi, Nübüvvet Kurumu ve Vahiy','Prof. Dr. Ömer Çelik',KM+'ders10-prof-dr-omer-celik.pdf')]},
+ vahiy:{metin:[
+  'Vahiy, sözlükte “hızlıca ve gizlice söylemek, işaret etmek, ilham etmek” demektir; terim olarak Allah’ın bir emri veya bilgiyi peygamberine gizli olarak bildirmesidir. Kur’an’da yetmişi aşkın yerde fiil kalıplarıyla geçer.',
+  'Siyer âlimleri, Cebrâil’in ilk vahyi getirirken Resûlullah’a abdesti ve namazı öğrettiği konusunda görüş birliği içindedir. İlk vahyin heyecanından sonra bir süre vahiy gelmedi; Hz. Peygamber sık sık Hira’ya gidip Cebrâil’in yeniden görünmesini bekledi, bu arada rabbinin kendisini terk ettiği endişesine kapıldı.']
+  ,dia:[DIA('vahiy','Vahiy'),DIA('hira','Hira')],
+  sv:[SV('prof-dr-omer-celik-peygamberligin-gelisi-nubuvvet-kurumu-ve-vahiy','YxQJgFKjxlY','Peygamberliğin Gelişi, Nübüvvet Kurumu ve Vahiy','Prof. Dr. Ömer Çelik',KM+'ders10-prof-dr-omer-celik.pdf')]},
+ gizli:{metin:[
+  'Davet yaklaşık üç yıl gizli sürdü. Hz. Peygamber, Mescid-i Harâm içinde Safâ tepesinin eteklerindeki Erkam b. Ebü’l-Erkam’ın evini kendine merkez seçti. Burada ashâba dinî bilgiler öğretiyor, ilâhî gerçeği arayanları İslâm’a davet ediyor, onlara Kur’an okuyor ve onlarla namaz kılıyordu.',
+  'Evin seçilmesinin sebepleri arasında Harem’e dahil oluşu ve hac-umre sebebiyle Mekkelilerle ve dışarıdan gelenlerle dikkat çekmeden temas kolaylığı sayılır. Hz. Ömer de İslâm’ı bu evde kabul etti. Ev, kaynaklarda sahâbîlerin müslüman oluş zamanını tarihlendirmek için kullanılır.']
+  ,dia:[DIA('darulerkam','Dârülerkam')],sv:[SV_APAYDIN]},
+ acik:{metin:[
+  'Açık davetle emrolununca Hz. Peygamber önce yakın akrabasını bir ziyafete çağırdı; Hâşimoğulları ve Muttaliboğulları’ndan yaklaşık kırk beş kişi katıldı. Amcası Ebû Leheb karşı çıktı.',
+  'Ebû Leheb, peygamberlikten önce Hz. Muhammed’in dostuydu; iki oğlunu onun kızları Rukıyye ve Ümmü Külsûm’la evlendirmişti. Peygamber olduktan sonra ise ona şiddetle karşı çıktı. Bu dönemde zayıf müslümanlara, Bilâl-i Habeşî gibi, eziyet edilmeye başlandı.']
+  ,dia:[DIA('ebu-leheb','Ebû Leheb'),DIA('bilal-i-habesi','Bilâl-i Habeşî')],
+  sv:[SV('hz-peygamberin-sas-akrabalari-ve-bu-baglarin-islami-davete-etkisi','TB7nHf2a2CE','Hz. Peygamber’in (sas) Akrabaları ve Bu Bağların İslamî Davete Etkisi','Siyer Vakfı')]},
+ habese:{metin:[
+  'Zulmü engelleyemeyen Hz. Peygamber, bazı müslümanlara hıristiyan Necâşî Ashame’nin ülkesi Habeşistan’a hicret etme izni verdi. Aralarında Hz. Osman ve eşi Rukıyye’nin de bulunduğu on bir erkek ve dört kadından oluşan kafile 615’te gitti. Bu, İslâm’da ilk hicrettir.',
+  'Kureyş heyet gönderip müslümanları geri istedi, Necâşî kabul etmedi; Bedir’den sonra gelen ikinci heyeti de reddetti. Habeş muhacirlerinden otuz üç kişi, Şi‘b-i Ebû Tâlib boykotunun bitmesinin ardından Mekke’ye döndü (620). Kalanların bir kısmı hicretten sonra, diğerleri 7 (628) yılında Medine’ye geldi.']
+  ,dia:[DIA('cafer-b-ebu-talib','Ca‘fer b. Ebû Tâlib')],
+  sv:[SV('prof-dr-levent-ozturk-habesistan-hicretleri-ve-garanik-hadisesi','4sgEvMUE6PU','Habeşistan Hicretleri ve Garanik Hadisesi','Prof. Dr. Levent Öztürk',KM+'ders13-prof-dr-levent-ozturk.pdf')]},
+ boykot:{metin:[
+  'Kureyş, Hâşimoğulları ve Muttaliboğulları’yla (Ebû Leheb ve oğulları hariç) konuşmamaya ve alışveriş yapmamaya karar verdi, kararın şartlarını bir kâğıda yazıp Kâbe’nin duvarına astı. Ebû Tâlib, yeğenini ve mensuplarını kendi mahallesinde (Şi‘bü Ebî Tâlib) topladı.',
+  'DİA’ya göre boykot 617–620 yıllarını kapsar; daha kısa sürdüğü de rivayet edilmiştir. Hatice ile Ebû Tâlib’in servetleri bu yıllarda tükendi, hac mevsimi dışında alışveriş yapılamadı. Ebû Tâlib’in yeğeni Züheyr b. Ümeyye ve Hişâm b. Amr, Mut‘im b. Adî ve Zem‘a b. Esved’le anlaşıp boykota son verdi.']
+  ,dia:[DIA('ebu-talib','Ebû Tâlib')],
+  sv:[SV('prof-dr-unal-kilic-sib-i-ebi-talip-muhasarasi-ve-bu-agir-imtihanin-etkileri','SUfoVL8E_m4','Şib-i Ebî Tâlib Muhasarası ve Bu Ağır İmtihanın Etkileri','Prof. Dr. Ünal Kılıç',KM+'ders15-prof-dr-unal-kilic.pdf')]},
+ huzun:{metin:[
+  'Nübüvvetin 10. yılında önce Hz. Hatice (10 Ramazan / 19 Nisan 620), ardından yaklaşık bir ay sonra Ebû Tâlib vefat etti. Vefat tarihleri hakkında farklı rivayetler vardır. Bu yıla “senetü’l-hüzn” (hüzün yılı) denilmiştir.',
+  'Ebû Tâlib’in himayesi sona erince Peygamber’in Mekke’de eskisi gibi korunması zorlaştı ve yeni yollar aramaya yöneldi: önce Tâif, sonra hac mevsiminde Medineli gruplarla görüşmeler.']
+  ,dia:[DIA('hatice','Hatice'),DIA('ebu-talib','Ebû Tâlib')],sv:[SV_APAK]},
+ taif:{metin:[
+  'Tâif, Mekke’nin 88 km doğusunda, denizden yaklaşık 1700 m yükseklikteki Vec vadisindedir; Hicaz’ın kışın en soğuk şehridir, yazın ise Mekke eşrafının sayfiyesiydi. Hz. Peygamber, Zeyd b. Hârise’yle Sakīf kabilesinin yaşadığı bu şehre gitti.',
+  'Amr b. Umeyr’in üç oğlunu (Abdüyâlîl, Mes‘ûd ve Habîb) ve kabilenin diğer önemli kişilerini İslâm’a davet etti; Kureyş’le akrabalık ve ticaret bağları olan Sakīfliler kabul etmedi. Mekke’ye girebilmek için bir Kureyşlinin himayesi gerekiyordu; başvurduğu pek çok kişi reddetti, sonunda Nevfeloğulları’nın reisi Mut‘im b. Adî himayesine aldı.',
+  'Hz. Âişe sonradan “Uhud’dan daha zor bir gün yaşadınız mı?” diye sorunca Resûlullah, Tâif dönüşünü anlattı.']
+  ,dia:[DIA('taif','Tâif')],
+  sv:[SV('prof-dr-riza-savas-hz-peygamberin-sas-geldigi-donemde-taif','Z3ZzUGXAK9o','Hz. Peygamber’in (sas) Geldiği Dönemde Tâif','Prof. Dr. Rıza Savaş'),SV_APAK]},
+ isra:{metin:[
+  'İsrâ, Hz. Peygamber’in mi‘râc sırasında Mescid-i Harâm’dan Mescid-i Aksâ’ya yolculuğunu ifade eder; Kur’an’da İsrâ sûresinin ilk âyetinde anılır. DİA kronolojisi İsrâ ve mi‘râcı 27 Receb 621’e koyar ve beş vakit namazın bu olayla farz kılındığını belirtir.',
+  'Siyer Vakfı’nın Mekke dersleri serisinde bu hadise ve Tâif’ten Akabe görüşmelerine uzanan süreç birlikte ele alınır.']
+  ,dia:[DIA('isra','İsrâ'),DIA('mirac','Mi‘râc')],
+  sv:[SV('prof-dr-cagfer-karadas-isra-ve-mirac-hadiseleri','dFqjS1A__E4','İsra ve Mirac Hadiseleri','Prof. Dr. Cağfer Karadaş',KM+'ders18-prof-dr-cagfer-karadas.pdf'),SV_APAK]},
+ akabe:{metin:[
+  'Akabe, sözlükte “sarp yol, dağdaki aşılması zor dik geçit” demektir. 620 hac mevsiminde Hazrecli bir grup Akabe’de Hz. Peygamber’le görüşüp müslüman oldu; Es‘ad b. Zürâre Yesrib’e dönüp yeni dini anlattı.',
+  'Ertesi yıl on iki kişi (on Hazrecli, iki Evsli) gizlice Akabe’de buluştu; Allah’a ortak koşmamak, hırsızlık ve zina yapmamak gibi şartlara biat ettiler (Birinci Akabe). Öğretmen olarak Mus‘ab b. Umeyr gönderildi.',
+  'Bir sonraki hac mevsiminde ikisi kadın yetmiş beş Yesribli geldi; Peygamber’i ve Mekkeli müslümanları kendi canlarını korudukları gibi koruyacaklarına söz verdiler (İkinci Akabe). Bundan sonra hicret izni verildi; ilk giden Âmir b. Rebîa ile eşi Leylâ oldu.']
+  ,dia:[DIA('akabe','Akabe'),DIA('musab-b-umeyr','Mus‘ab b. Umeyr')],
+  sv:[SV('prof-dr-adnan-demircan-akabe-biatlari-ve-bu-gorusmelerin-islam-toplumunun-olusumuna-etkileri','_mwHm3vpsS0','Akabe Biatları ve Bu Görüşmelerin İslam Toplumunun Oluşumuna Etkileri','Prof. Dr. Adnan Demircan',KM+'ders17-prof-dr-adnan-demircan.pdf'),SV_APAK]},
  hicret:{metin:[
-  'İkinci Akabe Biatı’ndan sonra müslümanlar kafileler halinde Medine’ye göç etmeye başladı. İlk giden Âmir b. Rebîa ile eşi Leylâ bint Ebû Hasme’dir.',
-  'Müşrikler Dârünnedve’de toplanıp Peygamber’i öldürmeye karar verdi (26 Safer / 9 Eylül 622). O gece Peygamber, Ebû Bekir’le birlikte Mekke’den ayrılıp Sevr dağındaki mağaraya sığındı. Kureyş, onu yakalayana 100 deve ödül vaat etti.',
-  'Üç gün sonra, kılavuzlarının getirdiği develerle yola çıktılar (1 Rebîülevvel / 13 Eylül). 8 Rebîülevvel / 20 Eylül’de Kubâ’ya vardılar ve Kubâ Mescidi’ni kurdular. 12 Rebîülevvel / 24 Eylül’de Rânûnâ vadisinde ilk cuma namazı kılındı; aynı gün Medine’ye ulaşıp Ebû Eyyûb el-Ensârî’nin evine yerleşti.']}
+  'Hicret terim olarak özellikle Hz. Peygamber’in ve Mekkeli müslümanların Medine’ye göçünü ifade eder. Medine’ye göç edenlere muhâcir, onlara yardım eden Medinelilere ensâr denildi. Kur’an’da “hicret” kelimesi geçmez ama aynı kökten türeyen kelimeler yirmi yedi âyette otuz bir kez yer alır.',
+  'Müşrikler Dârünnedve’de toplanıp Hz. Peygamber’i öldürmeye karar verdi (26 Safer / 9 Eylül 622). O gece Peygamber, Ebû Bekir’le Mekke’den ayrılıp Sevr dağındaki mağaraya saklandı; Kureyş onu yakalayana 100 deve vaat etti. Üç gün sonra, kılavuzun getirdiği develerle Yesrib’e doğru yola çıktılar (1 Rebîülevvel / 13 Eylül).',
+  '8 Rebîülevvel / 20 Eylül’de Kubâ’ya vardılar ve Kubâ Mescidi’ni kurdular. 12 Rebîülevvel / 24 Eylül’de Rânûnâ vadisinde ilk cuma namazı kılındı; aynı gün Medine’ye ulaşıp Ebû Eyyûb el-Ensârî’nin evine yerleştiler.']
+  ,dia:[DIA('hicret','Hicret'),DIA('sevr-magarasi','Sevr Mağarası'),DIA('kuba-mescidi','Kubâ Mescidi')],
+  sv:[SV('prof-dr-mustafa-agirman-mukaddes-yolculuk-hicret','pBKYtIAY1kI','Mukaddes Yolculuk Hicret','Prof. Dr. Mustafa Ağırman',KM+'ders19-prof-dr-mustafa-agirman.pdf'),SV('hicret-yurdu-yesribten-medineye-yrd-doc-dr-mahmut-kelpetin','MekYKiatPjg','Hicret Yurdu: Yesrib’ten Medine’ye','Yrd. Doç. Dr. Mahmut Kelpetin',IM+'ders-2-yrd-doc-mahmut-kelpetin.pdf')]},
+ 'medine-ilk':{metin:[
+  'Mescid-i Nebevî, hicretten sonraki ilk faaliyetlerden biri olarak bizzat Hz. Peygamber tarafından yaptırıldı (bizzat yaptırdığı iki mescitten biri; diğeri Kubâ’dır). Medine’deki bütün faaliyetlerinin merkezinde yer aldı ve sonraki camilere örnek oldu.',
+  'Muâhât, “kardeş edinme”dir: selâmın yayılması, açların doyurulması ve mescit yapılması gibi sosyal emirlerin yanında Mekkeli sahâbîler önce kendi aralarında, sonra ensardan bazılarıyla kardeş ilân edildi. Ebû Bekir–Ömer, Osman–Abdurrahman b. Avf, Talha–Zübeyr, Sa‘d b. Ebû Vakkās–Mus‘ab b. Umeyr bu çiftlerdendir.',
+  'Medine vesikası, hicretten kısa bir süre sonra Medine’deki müslümanlar, yahudiler ve müşrik Araplar arasında hazırlandı. Tam metni İbn Hişâm’ın es-Sîre’sinde günümüze ulaşmıştır; literatürde “Medine Sözleşmesi” ya da “Medine anayasası” da denir.']
+  ,dia:[DIA('mescid-i-nebevi','Mescid-i Nebevî'),DIA('muahat','Muâhât'),DIA('medine-vesikasi','Medine Vesikası')],
+  sv:[SV('ilk-yazili-anayasa-medine-vesikasi-prof-dr-servet-armagan','TWgTtwtaKHw','İlk Yazılı Anayasa: Medine Vesikası','Prof. Dr. Servet Armağan',IM+'ders-7-prof-dr-servet-armagan.pdf'),SV_MEDINE_KRON]},
+ bedir:{metin:[
+  'Bedir, Medine’nin yaklaşık 160 km güneybatısında, Kızıldeniz sahiline 30 km uzaklıkta, Medine–Mekke yolunun Suriye kervan yoluyla birleştiği küçük bir kasabaydı; her yıl zilkade başından itibaren sekiz gün süren bir panayır kurulurdu.',
+  'Hicretin 2. yılında (624) Ebû Süfyân idaresindeki büyük bir Kureyş ticaret kervanı Suriye’den dönüyordu. Peygamber, kervanı Bedir’de karşılamak için ashâbını topladı. Ebû Süfyân baskını öğrenince yardım istedi ve kendisi sahil yolundan kurtuldu; Kureyşliler kervan kurtulduğunu öğrenmelerine rağmen Ebû Cehil kumandasında yaklaşık 1000 kişiyle Bedir’e yürüdü. Savaş 17 Ramazan 2 / 13 Mart 624’te yapıldı.',
+  'Bedir, Kur’an’da adı geçen iki gazveden biridir (diğeri Huneyn).']
+  ,dia:[DIA('bedir-gazvesi','Bedir Gazvesi')],sv:[SV_SAVAS]},
+ uhud:{metin:[
+  'Uhud dağı Medine’nin kuzeyinde, Mescid-i Nebevî’ye yaklaşık 5 km uzaktadır; 8 km uzunluğunda, 720 m yüksekliğinde, koyu kırmızı görünümlü, tek başına bir dağdır. Hz. Peygamber “Uhud bizi sever, biz de Uhud’u severiz” demiştir.',
+  'Peygamber önce Medine dışında savaşmak istemiyordu; bazı sahâbîlerin ısrarı üzerine Uhud’a çıkıldı. Yolda Abdullah b. Übey 300 kadar adamıyla geri dönünce 700 sahâbî Uhud’un eteklerine geldi ve 7 veya 11 Şevval 3 (23 veya 27 Mart 625) günü düşmanla karşılaştı.']
+  ,dia:[DIA('uhud-gazvesi','Uhud Gazvesi')],sv:[SV_SAVAS]},
+ hendek:{metin:[
+  'Savaş, hicretin 5. yılı Şevval ayı sonlarında (Mart 627) başlayıp Zilkade’nin 23’ünde (15 Nisan) sona erdi. Şehrin savunması çevresine kazılan hendeklerle sağlandığı için Hendek denildi.',
+  'Saldıran tarafta Kureyşliler, Hayber yahudileri, Gatafânlılar, Fezâreliler, Esedoğulları, Süleymoğulları gibi birçok grup vardı; bu gruplar Kur’an’da “ahzâb” (hizipler) diye anıldığı için savaşa Ahzâb Gazvesi de denir. Ahzâb sûresi (33. sûre) 20 ve 22. âyetlerle bu kuşatmaya değinir. Hendek fikri Selmân-ı Fârisî’den gelir.']
+  ,dia:[DIA('hendek-gazvesi','Hendek Gazvesi'),DIA('selman-i-farisi','Selmân-ı Fârisî')],sv:[SV_SAVAS]},
+ hudeybiye:{metin:[
+  'Hudeybiye, Mekke’nin 17 km batısında, eski Cidde yolu üzerindedir. Adını, altında Bey‘atürrıdvân’ın yapıldığı ağaçtan (veya yanındaki kuyudan) alır.',
+  'Hz. Peygamber Zilkade 6’da (Mart 628) 1400–1500 kişiyle umre için Medine’den çıktı. Kureyş, Hâlid b. Velîd komutasında 200 kişilik bir süvari birliği gönderdi. Hz. Osman elçi olarak Mekke’ye gönderilince alıkonuldu; bunun üzerine Bey‘atürrıdvân yapıldı, ardından antlaşma imzalandı ve Feth sûresi indi.',
+  'Antlaşma “feth-i mübîn” (apaçık fetih) diye anılır: Mekke’nin fethine kadar geçen iki yılda müslüman olanların sayısı, o güne kadarki on sekiz yılda olanları aştı.']
+  ,dia:[DIA('hudeybiye-antlasmasi','Hudeybiye Antlaşması')],
+  sv:[SV('hikmet-ve-mesajlari-ile-hudeybiye-antlasmasi-prof-dr-casim-avci','5-9CREZCJKA','Hikmet ve Mesajları İle Hudeybiye Antlaşması','Prof. Dr. Casim Avcı',IM+'ders-17-prof-dr-casim-avci.pdf')]},
+ fetih:{metin:[
+  'Kureyşli müşrikler Hudeybiye Antlaşması’nı ihlâl edince Ebû Süfyân barışın devamı için girişimde bulundu. Hz. Peygamber 13 Ramazan 8 / 4 Ocak 630’da Mekke fethi için yola çıktı; Mekke 20 Ramazan / 11 Ocak 630’da fethedildi. Benî Süleym ve Benî Gıfâr kabileleri de Hâlid b. Velîd’in kumandasında fetihe katıldı.',
+  'Fetihten kısa süre önce (Safer 8) Hâlid b. Velîd, Amr b. Âs ve Osman b. Talha müslüman olmuştu. Mekke’den sonra Huneyn Gazvesi (11 Şevval / 1 Şubat) ve Tâif Gazvesi yapıldı.']
+  ,dia:[DIA('mekke','Mekke'),DIA('huneyn-gazvesi','Huneyn Gazvesi')],
+  sv:[SV('farkli-yonleri-ile-mekkenin-fethi-prof-dr-unal-kilic','48yuJOdl44A','Farklı Yönleri İle Mekke’nin Fethi','Prof. Dr. Ünal Kılıç',IM+'ders-21-prof-dr-unal-kilic.pdf')]},
+ veda:{metin:[
+  'Hz. Peygamber Veda Haccı için 26 Zilkade / 23 Şubat’ta Medine’den ayrıldı. 9 Zilhicce / 7 Mart 632’de Arafat vadisinde, sayıları 120.000’i aşan ashâbına Veda Hutbesi’ni okudu; 14 Zilhicce / 12 Mart’ta veda tavafını yaptı.',
+  'Hutbeye “aynı anne ve babadan türeyen bütün insanlar eşittir” sözüyle başlandı ve genellikle insan hakları üzerinde duruldu. Hutbenin ardından, dinin kemale erdiğini bildiren Mâide 5/3. âyeti indi. Haccı tamamlayan Peygamber Medine’ye döndü.']
+  ,dia:[DIA('veda-hacci','Vedâ Haccı'),DIA('veda-hutbesi','Vedâ Hutbesi')],sv:[SV_MEDINE_KRON]},
+ hastalik:{metin:[
+  'Veda Haccı’ndan sonra Safer’de Üsâme b. Zeyd, Suriye’ye gidecek orduya kumandan tayin edildi. Hz. Peygamber 27 Safer / 24 Mayıs 632 Pazar günü şiddetli baş ağrısı ve hummaya yakalandı. Hastalığında namazı Ebû Bekir’in kıldırmasını istedi.',
+  'DİA kronolojisine göre 13 Rebîülevvel / 8 Haziran 632 Pazartesi günü vefat etti, ertesi gün defnedildi. Naaşı, Ebû Bekir’in naklettiği bir hadise dayanılarak vefat ettiği yerde kazılan mezara Hz. Ali, Fazl, Kusem ve Üsâme tarafından indirildi.']
+  ,dia:[DIA('muhammed','Muhammed (kronoloji)')],sv:[SV_MEDINE_KRON]},
+ ebubekir:{metin:[
+  'Ebû Bekir, Fil Vak‘ası’ndan üç yıl kadar sonra Mekke’de doğdu. Hz. Peygamber’in vefatı üzerine, ensarın Sakīfetü Benî Sâide’de halife seçimini görüştüğünü öğrenince Hz. Ömer’le oraya gitti; ensar ve muhacirlerden birer emîr seçilmesi görüşüne karşı, birliğin korunması gerektiğini savundu ve halife seçildi.',
+  'Hilâfeti sırasında Kur’ân-ı Kerîm’i mushaf haline getirmesi, DİA’nın ifadesiyle İslâmiyet’e en büyük hizmetlerinden biridir; bu konuda Hz. Ömer onu ikna etmişti.']
+  ,dia:[DIA('ebu-bekir','Ebû Bekir'),DIA('sakifetu-beni-saide','Sakīfetü Benî Sâide'),DIA('ridde','Ridde'),DIA('mushaf','Mushaf')],
+  sv:[SV('hz-ebu-bekir-ra-ve-donemi-prof-dr-mustafa-fayda','UTplGZaJe7E','Hz. Ebû Bekir (ra) ve Dönemi','Prof. Dr. Mustafa Fayda')]},
+ omer:{metin:[
+  'Ömer, Fil Vak‘ası’ndan on üç yıl kadar sonra Mekke’de doğdu. Sakīfe’de Ebû Bekir’i halife seçilmesi için destekledi; Kur’an’ın mushaf haline getirilmesi için Ebû Bekir’i ikna eden de odur.',
+  'Hilâfeti döneminde Suriye ve Irak fetihleri hızlandı; Antakya, Urfa, Rakka ve Nusaybin kısa aralıklarla müslümanlara teslim oldu. Kudüs kuşatılınca Patrik Sophronios şehrin anahtarlarını Câbiye’de bulunan Hz. Ömer’e teslim etmek istediğini bildirdi.']
+  ,dia:[DIA('omer','Ömer'),DIA('yermuk-savasi','Yermük Savaşı')],
+  sv:[SV('hz-omer-ra-ve-donemi-prof-dr-mustafa-fayda','8RE_4OOhkEQ','Hz. Ömer (ra) ve Dönemi','Prof. Dr. Mustafa Fayda')]},
+ osman:{metin:[
+  'Osman, Fil Vak‘ası’ndan altı yıl sonra Tâif’te doğdu; Kureyş’in en zengin tüccarlarından birinin oğluydu. Hz. Ömer’in görevlendirdiği altı kişilik heyet arasından halife seçildi.',
+  'Kıraat farklarından doğan tartışmaları önlemek için, Ebû Bekir zamanında mushaf haline getirilen Kur’an’ı beş veya yedi nüsha olarak çoğalttı; Mekke, Basra, Kûfe, Şam, Yemen ve Bahreyn’e birer nüsha gönderdi, “imam mushaf” denilen nüshayı Medine’de bıraktı.',
+  'Şikâyetlerle başlayan isyan Hz. Osman’ın öldürülmesine, ardından Cemel ve Sıffîn savaşlarına uzanan iç savaşlar dönemine yol açtı. Kaynaklar bu isyanı çok ayrıntılı ama birbiriyle çelişen rivayetlerle anlatır.']
+  ,dia:[DIA('osman','Osman'),DIA('mushaf','Mushaf')],
+  sv:[SV('hz-osman-ra-ve-donemi-prof-dr-unal-kilic','TE0hcmceAQ8','Hz. Osman (ra) ve Dönemi','Prof. Dr. Ünal Kılıç')]},
+ ali:{metin:[
+  'Ali, Ebû Tâlib’in en küçük oğludur. Mekke’de kıtlık olunca Hz. Peygamber, amcasının yükünü hafifletmek için onu himayesine aldı; Ali beş yaşından hicrete kadar onun yanında büyüdü.',
+  'Cemel Vak‘ası, 15 Cemâziyelâhir 36 / 9 Aralık 656’da Basra önlerinde Hureybe mevkiinde yapıldı; Hz. Ali galip geldi, Talha ve Zübeyr de dahil pek çok müslüman öldü. Sıffîn’de (Zilhicce 36 / Haziran 657) Muâviye ile karşılaştılar; mushafların mızrak uçlarına bağlanması üzerine hakem olayı gündeme geldi, buna karşı çıkanlar Haricîler olarak ayrıldı.']
+  ,dia:[DIA('ali','Ali'),DIA('cemel-vakasi','Cemel Vak‘ası'),DIA('siffin-savasi','Sıffîn Savaşı'),DIA('kufe','Kûfe')],
+  sv:[SV('hz-ali-ra-ve-donemi-prof-dr-unal-kilic','OzzMvpB6LYk','Hz. Ali (ra) ve Dönemi','Prof. Dr. Ünal Kılıç')]}
 };
