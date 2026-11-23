@@ -13,3 +13,4 @@ Peygamberimizin hayatını ve dört halife dönemini adım adım anlatan Capacit
 ## Yapı
 - `www/js/app.js`: ekran tablosu (`EKRAN`), ekran yığını (`git/geri/sekme`), alt sekme çubuğu. `www/js/data.js`: içerik. `www/js/surum.js`: sürüm ve yenilikler.
 - APK: `.github/workflows/apk.yml` (commit mesajına `[apk]` yazılırsa derlenir). Simgeler `android-res/` ve `www/icons/`.
+- Web yayını: `.github/workflows/pages.yml` (GitHub Pages; ayarlarda Pages kaynağı "GitHub Actions" olmalı).

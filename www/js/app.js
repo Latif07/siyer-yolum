@@ -149,8 +149,11 @@
         ${(dt.metin || []).map(m => `<p>${esc(m)}</p>`).join('') || '<p class="soluk">Bu ders için geniş anlatım ve video daha sonra eklenecek.</p>'}
         ${dt.video ? `<a class="video" href="${esc(dt.video.url)}" target="_blank" rel="noopener">${ik('video')} ${esc(dt.video.baslik)}</a>` : ''}
         <p class="soluk kucukyazi">Kaynak: <a href="${DIA_URL}" target="_blank" rel="noopener">DİA, Muhammed maddesi</a> · <a href="https://siyervakfi.org/siyer/" target="_blank" rel="noopener">Siyer Vakfı</a></p></details>
-      <button class="btn" id="ileri">${cocuk() ? 'Hadi soruları çözelim' : 'İleri'} ${ik('ileri')}</button></main>`;
-    $('#ileri').onclick = () => { Q = { S: karistir(x.sorular), anahtar: id, ileri: sn, baslik: '', renk: d.renk, k: 0, puan: 0 }; git('soru'); };
+      <button class="btn" id="ileri">${sn ? 'İleri' : 'Bitir'} ${ik('ileri')}</button>
+      <button class="btn ikincil" id="soru">${cocuk() ? 'Soruları çözelim' : 'Kısa soruları çöz'}</button></main>`;
+    // İleri: soruları beklemeden bir sonraki derse geçer (ders okunmuş sayılır); sorular isteğe bağlı
+    $('#ileri').onclick = () => { S.biten[id] = 1; serisiYaz(); kaydet(); if (sn) { yigin.pop(); git('ders', sn.x.id); } else { toast('Bütün dersleri bitirdin'); sekme('yol'); } };
+    $('#soru').onclick = () => { Q = { S: karistir(x.sorular), anahtar: id, ileri: sn, baslik: '', renk: d.renk, k: 0, puan: 0 }; git('soru'); };
   };
 
   // ------------------------------------------------------------ sorular (ders sonu ve bölüm sınavı)

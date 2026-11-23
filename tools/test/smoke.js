@@ -38,17 +38,20 @@ const EKRANLAR = [['ana'], ['yol'], ['sinavlar'], ['ilerleme'], ['ben']];
     const zler = await sayfa.evaluate(() => SINAVLAR.map(z => z.id));
     for (const z of zler) await dene('sinav', [z]);
   }
-  // Ders zinciri: İleri → sorular → Sonraki ders, son derse kadar
-  await sayfa.evaluate(() => { window.SY.S.mod = 'buyuk'; window.SY.sekme('yol'); });
+  // Ders zinciri: İleri ile (soru çözmeden) son derse kadar; sonra bir derste soruları çöz
+  await sayfa.evaluate(() => { window.SY.S.mod = 'buyuk'; window.SY.S.biten = {}; window.SY.sekme('yol'); });
   await sayfa.click('[data-ders]');
   let adim = 0;
   for (;;) {
-    await sayfa.click('#ileri');
-    for (let k = 0; k < 2; k++) { await sayfa.click('.sik >> nth=0'); await sayfa.click('.btn'); }
     adim++;
-    if (!(await sayfa.$('#sonraki'))) break;
-    await sayfa.click('#sonraki');
+    const son = await sayfa.evaluate(() => !document.querySelector('#ileri').textContent.includes('İleri'));
+    await sayfa.click('#ileri');
+    if (son) break;
   }
+  await sayfa.evaluate(() => window.SY.git('ders', 'fil'));
+  await sayfa.click('#soru');
+  for (let k = 0; k < 2; k++) { await sayfa.click('.sik >> nth=0'); await sayfa.click('.btn'); }
+  if (!(await sayfa.$('#sonraki'))) hatalar.push('sorulardan sonra "Sonraki ders" yok');
   const toplam = await sayfa.evaluate(() => window.SY.TUM.length);
   if (adim !== toplam) hatalar.push(`zincir ${adim}/${toplam} derste kesildi`);
   console.log(`${sayi} ekran çizildi, zincir ${adim}/${toplam} ders, ${hatalar.length} hata`);
