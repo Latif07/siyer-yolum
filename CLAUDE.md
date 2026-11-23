@@ -5,7 +5,7 @@ Peygamberimizin hayatını ve dört halife dönemini adım adım anlatan Capacit
 ## Kurallar
 - Cevaplar kısa olsun; istenmeyen refactor yapma.
 - İçerik `www/js/data.js` içinde (dönemler, dersler, sorular, harita, "daha fazla bilgi"). Tarih ve olaylar TDV İslâm Ansiklopedisi «Muhammed» maddesi ve kronolojisine göre yazılır (islamansiklopedisi.org.tr/muhammed); farklı rivayet varsa ikisi de yazılır. Kaynak uydurma, video adresi uydurma.
-- Telifli görsel (ör. Siyer Atlası) kullanma; haritalar ve çizimler kendimizin.
+- Telifli görsel (ör. Siyer Atlası) yalnızca Siyer Vakfı'ndan yazılı izin gelirse kullanılır (talep taslağı: docs/izin-talebi-siyer-atlasi.md). Haritalarda kıyı çizgisi Natural Earth (kamu malı) verisidir; yerler ve yollar kendimizin.
 
 ## Test
 - `npm run test:smoke` (tools/test/smoke.js): uygulamayı açar, tüm ekranları ve ders zincirini çalıştırır, konsol hatası arar. Kod değişince çalıştır; çıktısı kısa. Yeni ekran eklenince `EKRANLAR` listesine ekle.

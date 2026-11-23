@@ -82,27 +82,62 @@
     n.querySelectorAll('[data-sek]').forEach(b => b.onclick = () => sekme(b.dataset.sek));
   }
 
-  // ------------------------------------------------------------ harita (şematik; ölçekli değil)
+  // ------------------------------------------------------------ harita (gerçek kıyı çizgisi, şematik yollar)
+  const DENIZ = [['Kızıldeniz', 20.2, 38.3, -52], ['Basra Körfezi', 27.3, 51.0, -35], ['Akdeniz', 34.2, 30.5, 0], ['Aden Körfezi', 12.2, 47.5, 0]];
+  const KITA = [['ARABİSTAN', 24.5, 44.8, 0], ['AFRİKA', 19.0, 30.0, 0], ['ŞAM', 35.2, 37.5, 0]];
   function harita(id) {
     const H = HARITA[id]; if (!H) return '';
     const P = H.yer.map(k => Object.assign({ k }, YERLER[k]));
     const lons = P.map(p => p.lon), lats = P.map(p => p.lat), mn = a => Math.min(...a), mx = a => Math.max(...a);
-    const cLon = (mn(lons) + mx(lons)) / 2, cLat = (mn(lats) + mx(lats)) / 2;
-    const u = Math.max((mx(lons) - mn(lons)) * 0.9 * 1.5 / 4, (mx(lats) - mn(lats)) * 1.5 / 3, 0.9), sc = 320 / (4 * u);
-    const X = lo => 160 + (lo - cLon) * 0.9 * sc, Y = la => 120 - (la - cLat) * sc, pt = (la, lo) => X(lo).toFixed(1) + ',' + Y(la).toFixed(1);
-    const fs = cocuk() ? 14 : 11;
-    let g = '<svg viewBox="0 0 320 240" role="img" aria-label="Şematik harita"><defs><marker id="ok" viewBox="0 0 10 10" refX="14" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs><rect width="320" height="240" fill="var(--deniz)"/>';
-    KARA.forEach(a => g += `<polygon points="${a.map(v => pt(v[0], v[1])).join(' ')}" fill="var(--kara)" stroke="var(--kiyi)" stroke-width="1.2"/>`);
-    const sx = X(38.6), sy = Y(20.2);
-    if (sx > 30 && sx < 290 && sy > 20 && sy < 220) g += `<text x="${sx}" y="${sy}" text-anchor="middle" font-size="10" font-style="italic" fill="var(--soluk)" transform="rotate(-35 ${sx} ${sy})">Kızıldeniz</text>`;
-    if (H.yol) g += `<polyline points="${H.yol.map(k => pt(YERLER[k].lat, YERLER[k].lon)).join(' ')}" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="6 4" stroke-linecap="round" marker-end="url(#ok)"/>`;
-    P.forEach(p => {
-      const x = X(p.lon), y = Y(p.lat), sol = x > 220;
-      g += `<circle cx="${x}" cy="${y}"  r="${cocuk() ? 9 : 5}" fill="currentColor" stroke="#fff" stroke-width="2"/>`;
-      if (cocuk()) g += `<text x="${x}" y="${y + 4.5}" text-anchor="middle" font-size="11">${p.e}</text>`;
-      g += `<text x="${x + (sol ? -13 : 13)}" y="${y + 4}" text-anchor="${sol ? 'end' : 'start'}" font-size="${fs}" font-weight="bold" fill="var(--metin)" stroke="var(--kara)" stroke-width="4" paint-order="stroke">${esc(p.ad)}</text>`;
+    const cLon = (mn(lons) + mx(lons)) / 2, cLat = (mn(lats) + mx(lats)) / 2, kx = Math.cos(cLat * Math.PI / 180);
+    const u = Math.max((mx(lons) - mn(lons)) * kx * 1.55 / 4, (mx(lats) - mn(lats)) * 1.55 / 3, 0.9), sc = 320 / (4 * u);
+    const X = lo => 160 + (lo - cLon) * kx * sc, Y = la => 120 - (la - cLat) * sc;
+    const ic = (x, y, m = 12) => x > m && x < 320 - m && y > m && y < 240 - m;
+    const f = n => n.toFixed(1), cocukM = cocuk();
+    const lonMin = cLon - 160 / (kx * sc), lonMax = cLon + 160 / (kx * sc), latMin = cLat - 120 / sc, latMax = cLat + 120 / sc;
+    let g = '<svg viewBox="0 0 320 240" role="img" aria-label="Şematik harita"><defs><marker id="ok" viewBox="0 0 10 10" refX="12" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>';
+    g += '<rect width="320" height="240" fill="var(--deniz)"/>';
+    // enlem-boylam ızgarası
+    const adim = [0.5, 1, 2, 5, 10].find(s => (lonMax - lonMin) / s <= 7) || 10;
+    for (let lo = Math.ceil(lonMin / adim) * adim; lo < lonMax; lo += adim) g += `<line x1="${f(X(lo))}" y1="0" x2="${f(X(lo))}" y2="240" stroke="var(--kiyi)" stroke-opacity=".22" stroke-width=".6"/>`;
+    for (let la = Math.ceil(latMin / adim) * adim; la < latMax; la += adim) g += `<line x1="0" y1="${f(Y(la))}" x2="320" y2="${f(Y(la))}" stroke="var(--kiyi)" stroke-opacity=".22" stroke-width=".6"/>`;
+    // kara: kıyıda yumuşak halka, sonra dolgu
+    const d = KARA.map(r => 'M' + r.map(v => f(X(v[1])) + ' ' + f(Y(v[0]))).join('L') + 'Z').join('');
+    g += `<path d="${d}" fill="none" stroke="var(--kiyi)" stroke-opacity=".3" stroke-width="6" stroke-linejoin="round"/>`;
+    g += `<path d="${d}" fill="var(--kara)" fill-rule="evenodd" stroke="var(--kiyi)" stroke-width="1" stroke-linejoin="round"/>`;
+    // deniz ve kıta adları
+    DENIZ.forEach(([ad, la, lo, r]) => { const x = X(lo), y = Y(la); if (ic(x, y, 30)) g += `<text x="${f(x)}" y="${f(y)}" text-anchor="middle" font-size="${cocukM ? 11 : 9}" font-style="italic" letter-spacing="1" fill="var(--soluk)" fill-opacity=".85" transform="rotate(${r} ${f(x)} ${f(y)})">${ad}</text>`; });
+    if (u > 2.2) KITA.forEach(([ad, la, lo]) => { const x = X(lo), y = Y(la); if (ic(x, y, 30) && !P.some(q => Math.hypot(X(q.lon) - x, Y(q.lat) - y) < 90)) g += `<text x="${f(x)}" y="${f(y)}" text-anchor="middle" font-size="8" letter-spacing="3" fill="var(--soluk)" fill-opacity=".5">${ad}</text>`; });
+    // yol
+    const sinir = [];
+    if (H.yol) g += `<polyline points="${H.yol.map(k => f(X(YERLER[k].lon)) + ',' + f(Y(YERLER[k].lat))).join(' ')}" fill="none" stroke="currentColor" stroke-width="2.6" stroke-dasharray="6 4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#ok)"/>`;
+    // bağlam şehirleri (soluk)
+    BAGLAM.filter(k => !H.yer.includes(k)).forEach(k => {
+      const p = YERLER[k], x = X(p.lon), y = Y(p.lat);
+      if (!ic(x, y, 22) || P.some(q => Math.hypot(X(q.lon) - x, Y(q.lat) - y) < 34)) return;
+      g += `<circle cx="${f(x)}" cy="${f(y)}" r="2.4" fill="var(--soluk)" fill-opacity=".7"/><text x="${f(x + 5)}" y="${f(y + 3)}" font-size="8" fill="var(--soluk)" stroke="var(--kara)" stroke-width="2.5" paint-order="stroke">${esc(p.ad)}</text>`;
     });
-    return `<figure class="harita" style="margin:14px 0">${g}</svg><figcaption>Şematik harita, ölçekli değildir.</figcaption></figure>`;
+    // vurgulanan yerler
+    const yerler = P.map(p => ({ p, x: X(p.lon), y: Y(p.lat) })).sort((a, b) => a.y - b.y);
+    yerler.forEach((e, i) => { // etiket, yakın komşunun tersi yöne konur; aynı yöndeki etiketler dikeyde ayrılır
+      const yakin = yerler.find(o => o !== e && Math.hypot(o.x - e.x, o.y - e.y) < 48);
+      e.sol = yakin ? (Math.abs(yakin.x - e.x) < 6 ? e.x > 215 : yakin.x > e.x) : e.x > 215;
+      e.ly = e.y;
+      for (let j = 0; j < i; j++) { const o = yerler[j]; if (o.sol === e.sol && Math.abs(o.ly - e.ly) < 13 && Math.abs(o.x - e.x) < 80) e.ly = o.ly + 13; }
+    });
+    yerler.forEach(({ p, x, y, ly, sol }) => {
+      const r = cocukM ? 9 : 5.5;
+      if (!cocukM && p.t === 'dag') g += `<path d="M${f(x - 6)} ${f(y + 5)}L${f(x)} ${f(y - 6)}L${f(x + 6)} ${f(y + 5)}Z" fill="currentColor" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>`;
+      else if (!cocukM && p.t === 'savas') g += `<path d="M${f(x)} ${f(y - 7)}L${f(x + 7)} ${f(y)}L${f(x)} ${f(y + 7)}L${f(x - 7)} ${f(y)}Z" fill="currentColor" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>`;
+      else g += `<circle cx="${f(x)}" cy="${f(y)}" r="${r}" fill="currentColor" stroke="#fff" stroke-width="2"/>`;
+      if (cocukM) g += `<text x="${f(x)}" y="${f(y + 4.5)}" text-anchor="middle" font-size="11">${p.e}</text>`;
+      g += `<text x="${f(x + (sol ? -(r + 6) : r + 6))}" y="${f(ly + 4)}" text-anchor="${sol ? 'end' : 'start'}" font-size="${cocukM ? 14 : 11.5}" font-weight="700" fill="var(--metin)" stroke="var(--kara)" stroke-width="4" paint-order="stroke">${esc(p.ad)}</text>`;
+    });
+    // ölçek çubuğu ve kuzey oku
+    const kmPx = sc / 111.32, km = [10, 20, 50, 100, 200, 500, 1000].find(k => k * kmPx >= 40) || 1000, w = km * kmPx;
+    g += `<g transform="translate(12 222)"><rect x="-4" y="-12" width="${f(w + 36)}" height="20" rx="4" fill="var(--kara)" fill-opacity=".85"/><path d="M0 0H${f(w)}M0 -4V4M${f(w)} -4V4" stroke="var(--metin)" stroke-width="1.3" fill="none"/><text x="${f(w + 4)}" y="3.5" font-size="9" fill="var(--metin)">${km} km</text></g>`;
+    g += `<g transform="translate(300 24)"><circle r="12" fill="var(--kara)" fill-opacity=".85"/><path d="M0 -8L4 4L0 1.5L-4 4Z" fill="var(--metin)"/><text y="11" text-anchor="middle" font-size="7" font-weight="700" fill="var(--metin)" transform="translate(0 -1)">K</text></g>`;
+    return `<figure class="harita" style="margin:14px 0">${g}</svg><figcaption>Şematik harita: kıyı çizgisi gerçek verilere dayanır (Natural Earth); yerler ve yollar yaklaşıktır.</figcaption></figure>`;
   }
 
   // ------------------------------------------------------------ ekranlar
