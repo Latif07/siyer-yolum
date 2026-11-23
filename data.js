@@ -309,3 +309,51 @@ const SINAVLAR=[
  {id:'s-sonrasi',ad:'Nübüvvet Sonrası',donemler:['mekke','medine','vefat']},
  {id:'s-halifeler',ad:'Dört Halife Sınavı',donemler:['halifeler']}
 ];
+
+/* ===== HARİTA VERİSİ =====
+ Şematik harita: kıyı çizgisi kabadır, ölçekli değildir (kendi çizimimiz; kitap görseli kullanılmadı).
+ Koordinatlar yaklaşık [enlem, boylam]. Derse yer eklemek için HARITA[dersId] = {yer:[...], yol:[...]} yaz. */
+const YERLER={
+ mekke:{ad:'Mekke',lat:21.42,lon:39.83,e:'🕋'},
+ medine:{ad:'Medine',lat:24.47,lon:39.61,e:'🕌'},
+ taif:{ad:'Tâif',lat:21.27,lon:40.42,e:'⛰️'},
+ bedir:{ad:'Bedir',lat:23.78,lon:38.77,e:'⚔️'},
+ ebva:{ad:'Ebvâ',lat:23.17,lon:39.15,e:'📍'},
+ hudeybiye:{ad:'Hudeybiye',lat:21.43,lon:39.63,e:'📜'},
+ arafat:{ad:'Arafat',lat:21.35,lon:39.98,e:'🤲'},
+ busra:{ad:'Busrâ',lat:32.52,lon:36.48,e:'🐪'},
+ sam:{ad:'Şam',lat:33.51,lon:36.29,e:'🏙️'},
+ kudus:{ad:'Kudüs',lat:31.78,lon:35.23,e:'🕌'},
+ habes:{ad:'Habeşistan',lat:14.13,lon:38.72,e:'👑'},
+ kufe:{ad:'Kûfe',lat:32.03,lon:44.4,e:'🏙️'},
+ basra:{ad:'Basra',lat:30.5,lon:47.8,e:'📍'}
+};
+const HARITA={
+ fil:{yer:['mekke']},sut:{yer:['mekke']},fudul:{yer:['mekke']},hacer:{yer:['mekke']},hira:{yer:['mekke']},
+ vahiy:{yer:['mekke']},gizli:{yer:['mekke']},acik:{yer:['mekke']},boykot:{yer:['mekke']},huzun:{yer:['mekke']},
+ amine:{yer:['mekke','medine','ebva'],yol:['mekke','medine','ebva']},
+ sam:{yer:['mekke','busra'],yol:['mekke','busra']},
+ hatice:{yer:['mekke','busra'],yol:['mekke','busra']},
+ habese:{yer:['mekke','habes'],yol:['mekke','habes']},
+ taif:{yer:['mekke','taif'],yol:['mekke','taif']},
+ isra:{yer:['mekke','kudus'],yol:['mekke','kudus']},
+ akabe:{yer:['mekke','medine'],yol:['mekke','medine']},
+ hicret:{yer:['mekke','medine'],yol:['mekke','medine']},
+ 'medine-ilk':{yer:['medine']},
+ bedir:{yer:['medine','bedir','mekke'],yol:['medine','bedir']},
+ uhud:{yer:['medine','mekke']},hendek:{yer:['medine','mekke']},
+ hudeybiye:{yer:['medine','hudeybiye','mekke'],yol:['medine','hudeybiye']},
+ fetih:{yer:['medine','mekke'],yol:['medine','mekke']},
+ veda:{yer:['medine','mekke','arafat'],yol:['medine','mekke','arafat']},
+ hastalik:{yer:['medine']},
+ ebubekir:{yer:['medine','sam'],yol:['medine','sam']},
+ omer:{yer:['medine','kudus','sam'],yol:['medine','kudus','sam']},
+ osman:{yer:['medine']},
+ ali:{yer:['medine','basra','kufe','sam']}
+};
+/* Kaba kara kütleleri: [enlem, boylam] köşeleri */
+const KARA=[
+ [[34,35.5],[29.5,35.0],[27.35,35.7],[26.2,36.45],[24.1,38.05],[22.8,39.0],[21.5,39.15],[20.15,40.27],[19.1,41.07],[16.9,42.55],[14.8,42.95],[13.3,43.25],[12.7,43.4],[12.7,52],[34,52]],
+ [[34,32.3],[34,35.5],[29.5,35.0],[27.9,34.3],[28.6,33.6],[29.95,32.65]],
+ [[34,26],[34,32.3],[29.95,32.45],[28.5,32.9],[27.25,33.7],[26.1,34.3],[25.1,34.9],[23.9,35.8],[19.6,37.2],[15.6,39.45],[13.0,42.7],[11.6,43.15],[11.6,26]]
+];

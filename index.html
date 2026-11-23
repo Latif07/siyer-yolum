@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Siyer Yolum</title>
 <style>
-:root{--bg:#f6f1e7;--kart:#fffdf8;--yazi:#2a2a2a;--soluk:#7a7468;--vurgu:#1f6f5c;--cizgi:#e4dccb;--r:14px;--font:Georgia,'Times New Roman',serif}
-body[data-mod=cocuk]{--bg:#fff6e0;--kart:#fff;--vurgu:#f08a24;--cizgi:#ffd9a0;--r:26px;--font:'Trebuchet MS','Segoe UI',system-ui,sans-serif;font-size:19px}
+:root{--deniz:#cfe3ee;--kara:#efe6d2;--kiyi:#b9ad92;--bg:#f6f1e7;--kart:#fffdf8;--yazi:#2a2a2a;--soluk:#7a7468;--vurgu:#1f6f5c;--cizgi:#e4dccb;--r:14px;--font:Georgia,'Times New Roman',serif}
+body[data-mod=cocuk]{--deniz:#bfe6f5;--kara:#ffe9b8;--kiyi:#f0c56a;--bg:#fff6e0;--kart:#fff;--vurgu:#f08a24;--cizgi:#ffd9a0;--r:26px;--font:'Trebuchet MS','Segoe UI',system-ui,sans-serif;font-size:19px}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--yazi);font-family:var(--font);line-height:1.55;font-size:17px}
 button{font:inherit;cursor:pointer}
@@ -49,6 +49,7 @@ body[data-mod=cocuk] .olay b::before{content:attr(data-e) " "}
 .sik.dogru{border-color:#2e9d5b;background:#e5f6ec}.sik.yanlis{border-color:#d34a4a;background:#fbe8e8}
 .aciklama{color:var(--soluk);font-size:.9em;margin:6px 0}
 .sinavlar{display:grid;gap:10px;margin-top:12px}.sinav{display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left;background:var(--kart);border:2px solid var(--vurgu);border-radius:var(--r);padding:12px 14px}.sinav em{font-style:normal;color:var(--soluk);font-size:.8em}
+.harita{margin:14px 0}.harita svg{display:block;width:100%;height:auto;border-radius:var(--r);border:1px solid var(--cizgi)}.hcap{font-size:.75em;color:var(--soluk);margin-top:4px}
 .yakinda-not{text-align:center;color:var(--soluk);padding:40px 0}
 </style>
 </head>
@@ -89,6 +90,26 @@ function ana(){
     const d=DONEMLER.find(x=>x.id===b.dataset.d);ders(d,d.dersler.find(x=>x.id===b.dataset.i))});
 }
 
+function harita(id){
+  const H=HARITA[id];if(!H)return'';
+  const P=H.yer.map(k=>Object.assign({k},YERLER[k]));
+  const lons=P.map(p=>p.lon),lats=P.map(p=>p.lat);
+  const mn=a=>Math.min(...a),mx=a=>Math.max(...a);
+  const cLon=(mn(lons)+mx(lons))/2,cLat=(mn(lats)+mx(lats))/2;
+  const u=Math.max((mx(lons)-mn(lons))*0.9*1.5/4,(mx(lats)-mn(lats))*1.5/3,0.9),sc=320/(4*u);
+  const X=lo=>160+(lo-cLon)*0.9*sc,Y=la=>120-(la-cLat)*sc,pt=(la,lo)=>X(lo).toFixed(1)+','+Y(la).toFixed(1);
+  const fs=mod==='cocuk'?14:11;
+  let g='<svg viewBox="0 0 320 240" role="img" aria-label="Şematik harita"><rect width="320" height="240" fill="var(--deniz)"/>';
+  KARA.forEach(a=>g+=`<polygon points="${a.map(v=>pt(v[0],v[1])).join(' ')}" fill="var(--kara)" stroke="var(--kiyi)" stroke-width="1.2"/>`);
+  const sx=X(38.6),sy=Y(20.2);
+  if(sx>30&&sx<290&&sy>20&&sy<220)g+=`<text x="${sx}" y="${sy}" text-anchor="middle" font-size="10" font-style="italic" fill="var(--soluk)" transform="rotate(-35 ${sx} ${sy})">Kızıldeniz</text>`;
+  if(H.yol)g+=`<polyline points="${H.yol.map(k=>pt(YERLER[k].lat,YERLER[k].lon)).join(' ')}" fill="none" stroke="var(--renk)" stroke-width="2.5" stroke-dasharray="6 4" stroke-linecap="round"/>`;
+  P.forEach(p=>{const x=X(p.lon),y=Y(p.lat),sol=x>220;
+    g+=`<circle cx="${x}" cy="${y}" r="${mod==='cocuk'?9:5}" fill="var(--renk)" stroke="#fff" stroke-width="2"/>`;
+    if(mod==='cocuk')g+=`<text x="${x}" y="${y+4.5}" text-anchor="middle" font-size="11">${p.e}</text>`;
+    g+=`<text x="${x+(sol?-13:13)}" y="${y+4}" text-anchor="${sol?'end':'start'}" font-size="${fs}" font-weight="bold" fill="var(--yazi)" stroke="var(--kara)" stroke-width="3" paint-order="stroke">${esc(p.ad)}</text>`});
+  return `<div class="harita">${g}</svg><div class="hcap">Şematik harita, ölçekli değildir.</div></div>`;
+}
 let aktif={};
 function ders(d,x){
   aktif={d,dn:x};const el=$('#ders');el.style.setProperty('--renk',d.renk);el.classList.add('ac');el.scrollTop=0;
@@ -96,7 +117,7 @@ function ders(d,x){
   let h=`<button class="geri" id="geri">← Yola dön</button><div><span class="yil">${x.yil}</span> <small>${d.ad}</small></div><h3>${esc(x.baslik)}</h3>`;
   const v=x[mod];
   if(!v){i.innerHTML=h+`<div class="yakinda-not">${mod==='cocuk'?'🚧 Bu ders yakında hazır olacak!':'Bu dersin içeriği daha sonra eklenecek.'}</div>`;$('#geri').onclick=kapat;return}
-  h+=`<div class="ozet">${esc(v.ozet)}</div><div class="zaman">`;
+  h+=`<div class="ozet">${esc(v.ozet)}</div>`+harita(x.id)+`<div class="zaman">`;
   v.olaylar.forEach(o=>h+=`<div class="olay"><b data-e="${o.e||''}">${esc(o.b)}</b>${esc(o.m)}${o.k?`<div class="kaynak">Kaynak: ${esc(o.k)}</div>`:''}</div>`);
   h+=`</div><button class="btn" id="soru">${mod==='cocuk'?'🎯 Hadi soruları çözelim!':'Kısa sınav'}</button>`;
   i.innerHTML=h;$('#geri').onclick=kapat;$('#soru').onclick=()=>quiz(x.sorular,0,0,x.id,()=>ders(aktif.d,x));
