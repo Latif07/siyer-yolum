@@ -50,6 +50,7 @@ body[data-mod=cocuk] .olay b::before{content:attr(data-e) " "}
 .aciklama{color:var(--soluk);font-size:.9em;margin:6px 0}
 .sinavlar{display:grid;gap:10px;margin-top:12px}.sinav{display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left;background:var(--kart);border:2px solid var(--vurgu);border-radius:var(--r);padding:12px 14px}.sinav em{font-style:normal;color:var(--soluk);font-size:.8em}
 .harita{margin:14px 0}.harita svg{display:block;width:100%;height:auto;border-radius:var(--r);border:1px solid var(--cizgi)}.hcap{font-size:.75em;color:var(--soluk);margin-top:4px}
+.detay{margin:18px 0 6px;background:var(--kart);border:1px solid var(--cizgi);border-radius:var(--r);padding:10px 14px}.detay summary{cursor:pointer;color:var(--vurgu);font-weight:bold}.detay p{margin:10px 0}.soluk{color:var(--soluk);font-size:.9em}.detay a{color:var(--vurgu)}.video{display:block;margin:10px 0;padding:10px 14px;border-radius:var(--r);background:var(--vurgu);color:#fff!important;text-decoration:none;text-align:center}.kaynakl{font-size:.8em;color:var(--soluk);margin-top:10px}.btn.ikinci{background:none;color:var(--vurgu);border:2px solid var(--vurgu)}
 .yakinda-not{text-align:center;color:var(--soluk);padding:40px 0}
 </style>
 </head>
@@ -110,6 +111,8 @@ function harita(id){
     g+=`<text x="${x+(sol?-13:13)}" y="${y+4}" text-anchor="${sol?'end':'start'}" font-size="${fs}" font-weight="bold" fill="var(--yazi)" stroke="var(--kara)" stroke-width="3" paint-order="stroke">${esc(p.ad)}</text>`});
   return `<div class="harita">${g}</svg><div class="hcap">Şematik harita, ölçekli değildir.</div></div>`;
 }
+const DIA_URL='https://islamansiklopedisi.org.tr/muhammed#19-hz-peygamber-devri-kronolojisi';
+function sonrakiDers(x){const t=DONEMLER.flatMap(d=>d.dersler.map(e=>({d,x:e}))),i=t.findIndex(e=>e.x.id===x.id);return t[i+1]||null}
 let aktif={};
 function ders(d,x){
   aktif={d,dn:x};const el=$('#ders');el.style.setProperty('--renk',d.renk);el.classList.add('ac');el.scrollTop=0;
@@ -119,8 +122,13 @@ function ders(d,x){
   if(!v){i.innerHTML=h+`<div class="yakinda-not">${mod==='cocuk'?'🚧 Bu ders yakında hazır olacak!':'Bu dersin içeriği daha sonra eklenecek.'}</div>`;$('#geri').onclick=kapat;return}
   h+=`<div class="ozet">${esc(v.ozet)}</div>`+harita(x.id)+`<div class="zaman">`;
   v.olaylar.forEach(o=>h+=`<div class="olay"><b data-e="${o.e||''}">${esc(o.b)}</b>${esc(o.m)}${o.k?`<div class="kaynak">Kaynak: ${esc(o.k)}</div>`:''}</div>`);
-  h+=`</div><button class="btn" id="soru">${mod==='cocuk'?'🎯 Hadi soruları çözelim!':'Kısa sınav'}</button>`;
-  i.innerHTML=h;$('#geri').onclick=kapat;$('#soru').onclick=()=>quiz(x.sorular,0,0,x.id,()=>ders(aktif.d,x));
+  const dt=(typeof DETAY!=='undefined'&&DETAY[x.id])||{};
+  h+=`</div><details class="detay"><summary>${mod==='cocuk'?'🔎 Daha çok öğren':'Daha fazla bilgi'}</summary>`
+    +((dt.metin||[]).map(m=>`<p>${esc(m)}</p>`).join('')||'<p class="soluk">Bu ders için geniş anlatım ve video daha sonra eklenecek.</p>')
+    +(dt.video?`<a class="video" href="${esc(dt.video.url)}" target="_blank" rel="noopener">🎬 ${esc(dt.video.baslik)}</a>`:'')
+    +`<div class="kaynakl">Kaynak: <a href="${DIA_URL}" target="_blank" rel="noopener">DİA, Muhammed maddesi</a> · <a href="https://siyervakfi.org/siyer/" target="_blank" rel="noopener">Siyer Vakfı</a></div></details>`
+    +`<button class="btn" id="soru">${mod==='cocuk'?'İleri ➡️':'İleri →'}</button>`;
+  i.innerHTML=h;$('#geri').onclick=kapat;$('#soru').onclick=()=>quiz(x.sorular,0,0,x.id,()=>ders(aktif.d,x),undefined,sonrakiDers(x));
 }
 function kapat(){$('#ders').classList.remove('ac');ana()}
 
@@ -130,12 +138,12 @@ function bolumSinavi(z){
   const el=$('#ders');el.style.setProperty('--renk','#1f6f5c');el.classList.add('ac');el.scrollTop=0;
   quiz(karistir(soruHavuzu(z)).slice(0,10),0,0,z.id,kapat,z.ad);
 }
-function quiz(S,k,puan,anahtar,geri,baslik){
+function quiz(S,k,puan,anahtar,geri,baslik,ileri){
   const i=$('#ic');
   if(k>=S.length){
     biten[anahtar]=anahtar.startsWith('s-')?Math.max(biten[anahtar]||0,puan):1;kaydet();
-    i.innerHTML=`<button class="geri" id="geri">← Yola dön</button><div class="yakinda-not" style="color:var(--yazi)"><div style="font-size:3em">${mod==='cocuk'?'🏆':'✓'}</div><h3>${puan} / ${S.length} doğru</h3><p>${mod==='cocuk'?'Aferin!':'Tamamlandı.'}</p></div>`;
-    $('#geri').onclick=kapat;return}
+    i.innerHTML=`<button class="geri" id="geri">← Yola dön</button><div class="yakinda-not" style="color:var(--yazi)"><div style="font-size:3em">${mod==='cocuk'?'🏆':'✓'}</div><h3>${puan} / ${S.length} doğru</h3><p>${mod==='cocuk'?'Aferin!':'Tamamlandı.'}</p></div>${ileri?`<button class="btn" id="ileri">${mod==='cocuk'?'Sonraki ders ➡️':'Sonraki ders →'}</button>`:''}`;
+    $('#geri').onclick=kapat;if(ileri)$('#ileri').onclick=()=>ders(ileri.d,ileri.x);return}
   const q=S[k];
   i.innerHTML=`<button class="geri" id="geri">← ${baslik?'Yola dön':'Derse dön'}</button><p><small>${baslik?esc(baslik)+' · ':''}Soru ${k+1}/${S.length}</small></p><h3>${esc(q.s)}</h3><div id="sec"></div><div class="aciklama" id="ac"></div>`;
   $('#geri').onclick=geri;
@@ -143,7 +151,7 @@ function quiz(S,k,puan,anahtar,geri,baslik){
     b.onclick=()=>{[...document.querySelectorAll('.sik')].forEach((e,n)=>{e.disabled=true;if(n===q.d)e.classList.add('dogru')});
       if(j!==q.d)b.classList.add('yanlis');
       $('#ac').textContent=q.a;const ok=j===q.d?1:0;
-      const n=document.createElement('button');n.className='btn';n.textContent='Devam';n.onclick=()=>quiz(S,k+1,puan+ok,anahtar,geri,baslik);$('#ac').after(n)};
+      const n=document.createElement('button');n.className='btn';n.textContent='Devam';n.onclick=()=>quiz(S,k+1,puan+ok,anahtar,geri,baslik,ileri);$('#ac').after(n)};
     $('#sec').append(b)});
 }
 modUygula();ana();

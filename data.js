@@ -357,3 +357,17 @@ const KARA=[
  [[34,32.3],[34,35.5],[29.5,35.0],[27.9,34.3],[28.6,33.6],[29.95,32.65]],
  [[34,26],[34,32.3],[29.95,32.45],[28.5,32.9],[27.25,33.7],[26.1,34.3],[25.1,34.9],[23.9,35.8],[19.6,37.2],[15.6,39.45],[13.0,42.7],[11.6,43.15],[11.6,26]]
 ];
+
+/* ===== DAHA FAZLA BİLGİ =====
+ DETAY[dersId]={metin:['paragraf',...], video:{baslik:'...',url:'https://...'}}
+ Video bağlantısı yalnızca gerçek ve doğrulanmış adresle eklenmeli. Şimdilik iki örnek metin var. */
+const DETAY={
+ fil:{metin:[
+  'Genel kabul gören kanaate göre Hz. Muhammed, Fil Vak‘ası’ndan elli (veya elli beş) gün sonra Rebîülevvel’in 12’sinde Pazartesi günü doğdu.',
+  'Miladi tarih için iki görüş vardır. Astronomi âlimi Mahmûd Paşa el-Felekî, oğlu İbrâhim’in vefatı sırasındaki güneş tutulmasından hareketle doğumu 9 Rebîülevvel / 20 Nisan 571 olarak hesaplamıştır. DİA’nın kronoloji tablosu ise 17 Haziran 569’u esas alır.',
+  'Kaynaklarda hicretten önceki bazı olaylar Peygamber’in yaşına göre tarihlendirildiği için, bu olayların miladi yılları doğum yılına göre değişebilir.']},
+ hicret:{metin:[
+  'İkinci Akabe Biatı’ndan sonra müslümanlar kafileler halinde Medine’ye göç etmeye başladı. İlk giden Âmir b. Rebîa ile eşi Leylâ bint Ebû Hasme’dir.',
+  'Müşrikler Dârünnedve’de toplanıp Peygamber’i öldürmeye karar verdi (26 Safer / 9 Eylül 622). O gece Peygamber, Ebû Bekir’le birlikte Mekke’den ayrılıp Sevr dağındaki mağaraya sığındı. Kureyş, onu yakalayana 100 deve ödül vaat etti.',
+  'Üç gün sonra, kılavuzlarının getirdiği develerle yola çıktılar (1 Rebîülevvel / 13 Eylül). 8 Rebîülevvel / 20 Eylül’de Kubâ’ya vardılar ve Kubâ Mescidi’ni kurdular. 12 Rebîülevvel / 24 Eylül’de Rânûnâ vadisinde ilk cuma namazı kılındı; aynı gün Medine’ye ulaşıp Ebû Eyyûb el-Ensârî’nin evine yerleşti.']}
+};
