@@ -1,0 +1,6 @@
+{
+  "appId": "com.latif07.siyeryolum",
+  "appName": "Siyer Yolum",
+  "webDir": "www",
+  "android": { "allowMixedContent": false }
+}

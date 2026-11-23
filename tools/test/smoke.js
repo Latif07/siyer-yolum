@@ -1,0 +1,58 @@
+// Duman testi: uygulama açılıyor mu, ekranlar hata vermeden çiziliyor mu, ders zinciri baştan sona gidiyor mu?
+// Çalıştır: npm run test:smoke   (Playwright gerekir: npm i -D playwright)
+const http = require('http'), fs = require('fs'), path = require('path');
+const { chromium } = require('playwright');
+const ROOT = path.resolve(__dirname, '../../www');
+const TIP = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.webmanifest': 'application/manifest+json', '.png': 'image/png', '.svg': 'image/svg+xml' };
+const sunucu = http.createServer((q, r) => {
+  let p = decodeURIComponent(q.url.split('?')[0]); if (p.endsWith('/')) p += 'index.html';
+  const f = path.join(ROOT, p);
+  if (!f.startsWith(ROOT) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { r.writeHead(404); return r.end(); }
+  r.writeHead(200, { 'Content-Type': TIP[path.extname(f)] || 'application/octet-stream' }); fs.createReadStream(f).pipe(r);
+});
+// Çizilmesi gereken ekranlar. Yeni ekran eklenince buraya ekle.
+const EKRANLAR = [['ana'], ['yol'], ['sinavlar'], ['ilerleme'], ['ben']];
+
+(async () => {
+  await new Promise(c => sunucu.listen(0, c));
+  const url = `http://localhost:${sunucu.address().port}/`;
+  const tarayici = await chromium.launch();
+  const sayfa = await (await tarayici.newContext({ viewport: { width: 390, height: 800 }, serviceWorkers: 'block' })).newPage();
+  const hatalar = [];
+  sayfa.on('pageerror', e => hatalar.push('pageerror: ' + e.message));
+  sayfa.on('console', m => { if (m.type() === 'error' && !/Failed to load resource|net::ERR/.test(m.text())) hatalar.push('console: ' + m.text()); });
+  await sayfa.goto(url);
+  let sayi = 0;
+  const dene = async (ad, arg) => {
+    try {
+      await sayfa.evaluate(([a, g]) => { window.SY.sekme('ana'); window.SY.git(a, ...g); }, [ad, arg]);
+      const bos = await sayfa.evaluate(() => document.getElementById('app').innerText.trim().length < 5);
+      if (bos) hatalar.push(`bos ekran: ${ad} ${JSON.stringify(arg)}`); else sayi++;
+    } catch (e) { hatalar.push(`${ad} ${JSON.stringify(arg)}: ${e.message.split('\n')[0]}`); }
+  };
+  for (const mod of ['buyuk', 'cocuk']) {
+    await sayfa.evaluate(m => { window.SY.S.mod = m; }, mod);
+    for (const [ad, ...a] of EKRANLAR) await dene(ad, a[0] || []);
+    const idler = await sayfa.evaluate(() => window.SY.TUM.map(e => e.x.id));
+    for (const id of idler) await dene('ders', [id]);
+    const zler = await sayfa.evaluate(() => SINAVLAR.map(z => z.id));
+    for (const z of zler) await dene('sinav', [z]);
+  }
+  // Ders zinciri: İleri → sorular → Sonraki ders, son derse kadar
+  await sayfa.evaluate(() => { window.SY.S.mod = 'buyuk'; window.SY.sekme('yol'); });
+  await sayfa.click('[data-ders]');
+  let adim = 0;
+  for (;;) {
+    await sayfa.click('#ileri');
+    for (let k = 0; k < 2; k++) { await sayfa.click('.sik >> nth=0'); await sayfa.click('.btn'); }
+    adim++;
+    if (!(await sayfa.$('#sonraki'))) break;
+    await sayfa.click('#sonraki');
+  }
+  const toplam = await sayfa.evaluate(() => window.SY.TUM.length);
+  if (adim !== toplam) hatalar.push(`zincir ${adim}/${toplam} derste kesildi`);
+  console.log(`${sayi} ekran çizildi, zincir ${adim}/${toplam} ders, ${hatalar.length} hata`);
+  hatalar.slice(0, 15).forEach(h => console.log('  ' + h));
+  await tarayici.close(); sunucu.close();
+  process.exit(hatalar.length ? 1 : 0);
+})();

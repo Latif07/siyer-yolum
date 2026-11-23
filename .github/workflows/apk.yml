@@ -1,0 +1,72 @@
+name: APK derle
+
+on:
+  push:
+    branches: [main]
+    paths: ['www/**', 'android-res/**', 'package.json', 'capacitor.config.json', '.github/workflows/apk.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    # Push'ta APK yalnızca commit mesajında [apk] varsa derlenir (önce web'de test edilir); elle başlatma her zaman derler
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[apk]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Duman testi (başarısız olursa yayın yapılmaz)
+        run: |
+          npm install --no-save --no-audit --no-fund playwright@1.58.0
+          npx playwright install --with-deps chromium
+          node tools/test/smoke.js
+
+      - name: Uygulama dosyalarını hazırla
+        run: mkdir -p proje && cp -r www android-res package.json capacitor.config.json proje/
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Android SDK 36
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0" > /dev/null || echo "SDK kurulumu atlandı, Gradle kendisi indirecek"
+
+      - name: Android projesini hazırla
+        working-directory: proje
+        run: |
+          npm install --no-audit --no-fund
+          npx cap add android
+          npx cap sync android
+          # Uygulama simgesi
+          rm -rf android/app/src/main/res/mipmap-anydpi-v26
+          cp -r android-res/mipmap-* android/app/src/main/res/
+          # Sabit imza anahtarı: güncellemeler eski sürümün üstüne kurulabilsin
+          mkdir -p ~/.android && cp android-res/debug.keystore ~/.android/debug.keystore
+          # Sürüm numarası
+          SURUM=$(node -e "process.stdout.write(require('./www/js/surum.js').SURUM)")
+          sed -i "s/versionCode 1/versionCode ${{ github.run_number }}/; s/versionName \"1.0\"/versionName \"$SURUM\"/" android/app/build.gradle
+          echo "SURUM=$SURUM" >> $GITHUB_ENV
+          node -e "const v=require('./www/js/surum.js');const x=v.LISTE.find(y=>y.s===v.SURUM)||{l:[]};process.stdout.write('Telefona kurmak için aşağıdaki **siyer-yolum.apk** dosyasına dokun.\nGüncellemeler eskisinin üstüne kurulur, ilerlemen silinmez.\n\n### Yenilikler\n'+x.l.map(m=>'- '+m).join('\n')+'\n')" > ../surum-notu.md
+
+      - name: APK derle
+        working-directory: proje/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon -q
+          cp app/build/outputs/apk/debug/app-debug.apk ../../siyer-yolum.apk
+
+      - name: Releases'a koy
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.SURUM }}
+          name: Siyer Yolum ${{ env.SURUM }}
+          body_path: surum-notu.md
+          files: siyer-yolum.apk
+          make_latest: true

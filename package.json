@@ -1,0 +1,13 @@
+{
+  "name": "siyer-yolum",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Peygamberimizin hayatını ve dört halife dönemini adım adım anlatan uygulama",
+  "dependencies": {
+    "@capacitor/android": "8.6.2",
+    "@capacitor/cli": "8.6.2",
+    "@capacitor/core": "8.6.2"
+  },
+  "scripts": { "test:smoke": "node tools/test/smoke.js" },
+  "devDependencies": { "playwright": "^1.50.0" }
+}

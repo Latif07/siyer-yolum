@@ -1,0 +1,12 @@
+{
+  "name": "Siyer Yolum: Peygamberimizin Hayatı",
+  "short_name": "Siyer Yolum",
+  "description": "Peygamberimizin hayatını ve dört halife dönemini adım adım anlatan uygulama: çocuk ve büyük modu, haritalar, kısa sınavlar.",
+  "start_url": "./", "scope": "./", "display": "standalone", "orientation": "portrait",
+  "background_color": "#f6f2e9", "theme_color": "#0f5a47", "lang": "tr", "id": "./",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "categories": ["education", "books"]
+}
