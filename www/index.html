@@ -28,6 +28,10 @@
   <script src="js/content-en-3.js"></script>
   <script src="js/app.js"></script>
   <script>
+    // Hesap/bulut (Firebase, ~900 KB) yalnızca giriş ekranı açılınca ya da daha önce giriş yapıldıysa yüklenir.
+    window.bulutYukle = function () { if (window.__bulutYukleniyor) return; window.__bulutYukleniyor = true; var s = document.createElement('script'); s.type = 'module'; s.src = 'js/bulut.js'; document.body.appendChild(s); };
+  </script>
+  <script>
     if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(function () {});
   </script>
 </body>

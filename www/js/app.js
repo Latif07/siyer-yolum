@@ -11,8 +11,42 @@
   const S = { mod: 'buyuk', tema: 'oto', biten: {}, sinav: {}, seri: { gun: 0, son: '' }, tekrar: {}, gunluk: { tarih: '', n: 0, devam: 0 } };
   try { Object.assign(S, JSON.parse(localStorage.getItem(ANAHTAR) || '{}')); } catch (e) { }
   if (!S.dil) S.dil = String(navigator.language || 'tr').toLowerCase().startsWith('tr') ? 'tr' : 'en';
+  window.DIL = S.dil;
   const T = (tr, en) => (S.dil === 'en' ? en : tr);
-  const kaydet = () => { try { localStorage.setItem(ANAHTAR, JSON.stringify(S)); } catch (e) { } };
+  const kaydet = () => { try { localStorage.setItem(ANAHTAR, JSON.stringify(S)); } catch (e) { } bulutaYaz(); };
+
+  // ------------------------------------------------------------ hesap ve bulut eşitleme (Kur'an Yolum ile aynı giriş)
+  const HESAP = { u: null, durum: '', yazTimer: 0 };
+  const EŞ = ['mod', 'tema', 'dil', 'biten', 'sinav', 'seri', 'tekrar', 'gunluk'];
+  const paket = () => Object.fromEntries(EŞ.map(k => [k, S[k]]));
+  function birlestir(u) { // uzaktaki ve yerel ilerleme birleşir; hiçbir şey kaybolmaz
+    if (!u) return;
+    Object.assign(S.biten, u.biten || {}, S.biten);
+    Object.entries(u.sinav || {}).forEach(([k, v]) => { S.sinav[k] = Math.max(S.sinav[k] || 0, v); });
+    if (u.seri && (u.seri.son || '') > (S.seri.son || '')) S.seri = u.seri;
+    Object.entries(u.tekrar || {}).forEach(([k, r]) => { const y = S.tekrar[k]; if (!y || r.due > y.due) S.tekrar[k] = r; });
+    if (u.gunluk && u.gunluk.tarih === gunBugun() && S.gunluk.tarih !== gunBugun()) S.gunluk = u.gunluk;
+  }
+  function bulutYukle(cb) {
+    if (window.Bulut) return cb(window.Bulut);
+    window.addEventListener('bulut-hazir', () => cb(window.Bulut), { once: true });
+    if (window.bulutYukle) window.bulutYukle();
+  }
+  function bulutaYaz() {
+    if (!HESAP.u || !window.Bulut) return;
+    clearTimeout(HESAP.yazTimer);
+    HESAP.yazTimer = setTimeout(() => { window.Bulut.yukle(paket()).then(() => { HESAP.durum = 'tamam'; }, () => { HESAP.durum = 'hata'; }); }, 1500);
+  }
+  function hesapBaslat() {
+    let girisli = false; try { girisli = localStorage.getItem(ANAHTAR + '.bulut') === '1'; } catch (e) { }
+    if (!girisli) return;
+    bulutYukle(B => B.dinle(u => {
+      const ilk = !HESAP.u && u; HESAP.u = u;
+      try { localStorage.setItem(ANAHTAR + '.bulut', u ? '1' : '0'); } catch (e) { }
+      if (ilk) B.indir().then(v => { birlestir(v); try { localStorage.setItem(ANAHTAR, JSON.stringify(S)); } catch (e) { } yerel(); return B.yukle(paket()); }).then(() => { HESAP.durum = 'tamam'; ciz(); }, () => { HESAP.durum = 'hata'; ciz(); });
+      else ciz();
+    }));
+  }
   const gecti = id => !!S.biten[id];
   const cocuk = () => S.mod === 'cocuk';
   function temaUygula() {
@@ -375,9 +409,33 @@
       <p class="soluk kucukyazi" style="text-align:center">${T('Toplam', 'Total')}: ${bitti}/${tum} ${T('ders', 'lessons')}</p></main>`;
   };
 
+  function hesapKarti() {
+    const u = HESAP.u, hata = EKRAN.ben._hata ? `<p class="soluk" role="alert" style="color:var(--kotu)">${esc(EKRAN.ben._hata)}</p>` : '';
+    if (u) return `<section class="kart"><h2>${T('Hesabın', 'Your account')}</h2><p class="soluk" style="margin:0 0 10px">${esc(u.email || '')}<br><small>${HESAP.durum === 'hata' ? T('Eşitlenemedi; internet gelince tekrar denenir.', 'Could not sync; will retry when online.') : T('İlerlemen hesabına kaydediliyor ✓', 'Your progress is saved to your account ✓')}</small></p><button class="btn ikincil" id="cikis">${T('Çıkış yap', 'Sign out')}</button></section>`;
+    return `<section class="kart"><h2>${T('Giriş yap', 'Sign in')}</h2><p class="soluk" style="margin:0 0 10px">${T('İlerlemen kaybolmasın; Kur’an Yolum hesabınla giriş yap.', 'Keep your progress safe; sign in with your Kur’an Yolum account.')}</p>
+      <form id="hesap-form"><input id="eposta" type="email" autocomplete="email" placeholder="${T('E-posta', 'Email')}" required style="width:100%;padding:12px;margin:0 0 8px;border:2px solid var(--cizgi);border-radius:var(--r);font:inherit;background:var(--kart);color:inherit;box-sizing:border-box">
+      <input id="sifre" type="password" autocomplete="current-password" placeholder="${T('Şifre', 'Password')}" required minlength="6" style="width:100%;padding:12px;margin:0 0 8px;border:2px solid var(--cizgi);border-radius:var(--r);font:inherit;background:var(--kart);color:inherit;box-sizing:border-box">${hata}
+      <button class="btn" type="submit" id="giris">${T('Giriş yap', 'Sign in')}</button></form>
+      <button class="btn ikincil" id="kayit">${T('Hesap oluştur', 'Create account')}</button>
+      <button class="btn ikincil" id="google">${T('Google ile devam et', 'Continue with Google')}</button>
+      <p style="text-align:center;margin:8px 0 0"><a href="#" id="unuttum" class="lnk">${T('Şifremi unuttum', 'Forgot password')}</a></p></section>`;
+  }
+  function hesapBagla() {
+    const c = $('#cikis'); if (c) c.onclick = () => window.Bulut.cikis().then(() => { HESAP.u = null; try { localStorage.setItem(ANAHTAR + '.bulut', '0'); } catch (e) { } ciz(); });
+    if (!$('#hesap-form')) return;
+    bulutYukle(() => { }); // form açıldığında Firebase arka planda yüklenir
+    const calis = f => async ev => { if (ev) ev.preventDefault(); EKRAN.ben._hata = ''; const e = $('#eposta').value, p = $('#sifre').value;
+      try { const B = await new Promise(r => bulutYukle(r)); await f(B, e, p); try { localStorage.setItem(ANAHTAR + '.bulut', '1'); } catch (x) { } hesapBaslatSifirla(); } catch (x) { EKRAN.ben._hata = x.message; ciz(); } };
+    $('#hesap-form').onsubmit = calis((B, e, p) => B.giris(e, p));
+    $('#kayit').onclick = calis((B, e, p) => B.kayit(e, p));
+    $('#google').onclick = calis(B => B.googleIle());
+    $('#unuttum').onclick = async ev => { ev.preventDefault(); const e = $('#eposta').value; if (!e) { EKRAN.ben._hata = T('Önce e-posta adresini yaz.', 'Enter your email first.'); return ciz(); } try { const B = await new Promise(r => bulutYukle(r)); await B.sifreSifirla(e); toast(T('Şifre sıfırlama e-postası gönderildi', 'Password reset email sent')); } catch (x) { EKRAN.ben._hata = x.message; ciz(); } };
+  }
+  function hesapBaslatSifirla() { HESAP.u = null; hesapBaslat(); }
   EKRAN.ben = function () {
     const sifirlaOnay = EKRAN.ben._onay;
     app.innerHTML = `${ust(T('Ben', 'Me'), false)}<main>
+      ${hesapKarti()}
       <p class="baslik" style="margin-top:4px">${T('Dil', 'Language')}</p>
       <div class="secim" style="grid-template-columns:repeat(2,1fr)" role="group" aria-label="${T('Dil', 'Language')}"><button data-dil="tr" class="${S.dil === 'tr' ? 'on' : ''}" lang="tr">Türkçe</button><button data-dil="en" class="${S.dil === 'en' ? 'on' : ''}" lang="en">English</button></div>
       <p class="baslik">${T('Görünüm modu', 'Display mode')}</p>
@@ -390,6 +448,7 @@
       <button class="bolum tehlike" id="sifirla"><span class="ikon" style="color:var(--kotu)">${IKON.sil}</span><span class="bad">${T(sifirlaOnay ? 'Emin misin? Tekrar dokun' : 'İlerlemeyi sıfırla', sifirlaOnay ? 'Are you sure? Tap again' : 'Reset progress')}<small>${T(sifirlaOnay ? 'Tüm dersler ve sınav sonuçları silinir' : 'Dersler ve sınav sonuçları silinir', sifirlaOnay ? 'All lessons and quiz results will be deleted' : 'Lessons and quiz results are deleted')}</small></span></button></div>
       <p class="soluk kucukyazi" style="margin-top:18px">${T('İçerik taslaktır: tarihler TDV İslâm Ansiklopedisi «Muhammed» maddesi ve kronolojisiyle karşılaştırılmıştır; yayın öncesi Diyanet yayınlarıyla da doğrulanmalıdır.', 'The content is a draft: dates were compared with the TDV Encyclopedia of Islam “Muhammed” article and its chronology, and should also be verified against Diyanet publications before release. The English text is a translation of the Turkish content.')}</p>
       <p class="soluk kucukyazi">${T('Siyer Yolum', 'Seerah Path')} ${esc(SURUM_BILGI.SURUM)}</p></main>`;
+    hesapBagla();
     app.querySelectorAll('[data-dil]').forEach(b => b.onclick = () => dilAyarla(b.dataset.dil));
     app.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { S.mod = b.dataset.m; kaydet(); ciz(); });
     app.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { S.tema = b.dataset.t; kaydet(); ciz(); });
@@ -397,5 +456,5 @@
   };
 
   window.SY = { EKRAN, git, sekme, geri, S, get TUM() { return TUM; }, ciz, dilAyarla, durum: () => yigin.slice() };
-  temaUygula(); ciz();
+  temaUygula(); ciz(); hesapBaslat();
 })();
