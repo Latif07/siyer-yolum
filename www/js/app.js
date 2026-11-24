@@ -156,18 +156,29 @@
     const kmPx = sc / 111.32, km = [10, 20, 50, 100, 200, 500, 1000].find(k => k * kmPx >= 40) || 1000, w = km * kmPx;
     g += `<g transform="translate(12 222)"><rect x="-4" y="-12" width="${f(w + 36)}" height="20" rx="4" fill="var(--kara)" fill-opacity=".85"/><path d="M0 0H${f(w)}M0 -4V4M${f(w)} -4V4" stroke="var(--metin)" stroke-width="1.3" fill="none"/><text x="${f(w + 4)}" y="3.5" font-size="9" fill="var(--metin)">${km} km</text></g>`;
     g += `<g transform="translate(300 24)"><circle r="12" fill="var(--kara)" fill-opacity=".85"/><path d="M0 -8L4 4L0 1.5L-4 4Z" fill="var(--metin)"/><text y="11" text-anchor="middle" font-size="7" font-weight="700" fill="var(--metin)" transform="translate(0 -1)">${T('K', 'N')}</text></g>`;
-    return `<figure class="harita" style="margin:14px 0">${g}</svg><figcaption>${T('Şematik harita: kıyı çizgisi gerçek verilere dayanır (Natural Earth); yerler ve yollar yaklaşıktır.', 'Schematic map: the coastline is based on real data (Natural Earth); places and routes are approximate.')}</figcaption></figure>`;
+    return `<figure class="harita" style="margin:14px 0">${g}</svg></figure>`;
   }
 
   // Kendi çizimlerimiz (SVG): figürsüz, sembolik; anlatımı pekiştirir
   function cizim(id) {
     const C = (typeof CIZIM !== 'undefined' && CIZIM[id]); if (!C) return '';
-    return `<figure class="harita cizim" style="margin:14px 0">${C.svg()}<figcaption>${esc(T(C.ad[0], C.ad[1]))} · ${T('Çizim: Siyer Yolum (sembolik, insan figürü yok)', 'Illustration: Seerah Path (symbolic, no human figures)')}</figcaption></figure>`;
+    const K = cocuk() && typeof CIZIM_C !== 'undefined' && CIZIM_C[id];
+    return `<figure class="harita cizim" style="margin:14px 0" role="img" aria-label="${esc(T(C.ad[0], C.ad[1]))}">${(K || C.svg)()}</figure>`;
   }
   // Özgür lisanslı görseller (Wikimedia Commons): her görselin altında başlık, yazar, lisans ve kaynak bağlantısı
   function gorsel(id) {
     const G = (typeof GORSEL !== 'undefined' && GORSEL[id]) || []; if (!G.length) return '';
-    return `<div class="atlas">${G.map(g => `<figure><img src="${esc(g.dosya)}" alt="${esc(T(g.baslik[0], g.baslik[1]))}" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>${esc(T(g.baslik[0], g.baslik[1]))} · ${esc(g.yazar)}, ${esc(g.lisans)} · <a href="${esc(g.kaynak)}" target="_blank" rel="noopener">Wikimedia Commons</a></figcaption></figure>`).join('')}</div>`;
+    return `<div class="atlas">${G.map(g => `<figure><img src="${esc(g.dosya)}" alt="${esc(T(g.baslik[0], g.baslik[1]))}" loading="lazy" onerror="this.closest('figure').remove()"></figure>`).join('')}</div>`;
+  }
+  // Sayfa sonundaki "Kaynaklar": çizim, harita ve fotoğraf bilgileri resimlerin altında değil burada
+  function kaynaklar(id) {
+    const L = [], C = (typeof CIZIM !== 'undefined' && CIZIM[id]), G = (typeof GORSEL !== 'undefined' && GORSEL[id]) || [], A = (typeof ATLAS !== 'undefined' && ATLAS[id]) || [];
+    if (C) L.push(`<b>${T('Çizim', 'Illustration')}:</b> ${esc(T(C.ad[0], C.ad[1]))}. ${T('Siyer Yolum’un kendi çizimi; sembolik, insan figürü yok.', 'Drawn for Seerah Path; symbolic, no human figures.')}`);
+    if (HARITA[id]) L.push(`<b>${T('Harita', 'Map')}:</b> ${T('şematik; kıyı çizgisi Natural Earth verisi (kamu malı), yerler ve yollar yaklaşıktır.', 'schematic; coastline from Natural Earth data (public domain), places and routes are approximate.')}`);
+    G.forEach(g => L.push(`<b>${T('Fotoğraf', 'Photo')}:</b> ${esc(T(g.baslik[0], g.baslik[1]))} · ${esc(g.yazar)}, ${esc(g.lisans)} · <a href="${esc(g.kaynak)}" target="_blank" rel="noopener">Wikimedia Commons</a>`));
+    A.forEach(g => L.push(`<b>${T('Görsel', 'Image')}:</b> ${esc(g.baslik)} · Siyer Atlası, Siyer Vakfı`));
+    if (!L.length) return '';
+    return `<section class="kaynaklar" aria-label="${T('Kaynaklar', 'Sources')}"><h3>${T('Kaynaklar', 'Sources')}</h3><ul>${L.map(x => `<li>${x}</li>`).join('')}</ul></section>`;
   }
   // Kitaptaki (Siyer-i Nebî) bölüm adı: dersin başlığının altında küçük satır
   function bolumSatiri(x) {
@@ -178,7 +189,7 @@
   // Siyer Atlası görselleri (ATLAS boşsa hiçbir şey çizilmez)
   function atlas(id) {
     const A = (typeof ATLAS !== 'undefined' && ATLAS[id]) || []; if (!A.length) return '';
-    return `<div class="atlas">${A.map(g => `<figure><img src="${esc(g.dosya)}" alt="${esc(g.baslik)}" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>${esc(g.baslik)} · Siyer Atlası, Siyer Vakfı</figcaption></figure>`).join('')}</div>`;
+    return `<div class="atlas">${A.map(g => `<figure><img src="${esc(g.dosya)}" alt="${esc(g.baslik)}" loading="lazy" onerror="this.closest('figure').remove()"></figure>`).join('')}</div>`;
   }
 
   // ------------------------------------------------------------ ekranlar
@@ -226,7 +237,7 @@
         ${(dt.dia || []).length ? `<p class="baslik" style="margin:16px 0 8px">${T('TDV İslâm Ansiklopedisi maddeleri', 'TDV Encyclopedia of Islam entries (in Turkish)')}</p><div class="kaynak-btn">${dt.dia.map(d => `<a class="lnk" href="${esc(d.url)}" target="_blank" rel="noopener">${esc(d.ad)}</a>`).join('')}</div>` : ''}
       </details>
       <button class="btn" id="ileri">${T(sn ? 'İleri' : 'Bitir', sn ? 'Next' : 'Finish')} ${ik('ileri')}</button>
-      <button class="btn ikincil" id="soru">${T(cocuk() ? 'Soruları çözelim' : 'Kısa soruları çöz', cocuk() ? 'Let’s solve the questions' : 'Take the short quiz')}</button></main>`;
+      <button class="btn ikincil" id="soru">${T(cocuk() ? 'Soruları çözelim' : 'Kısa soruları çöz', cocuk() ? 'Let’s solve the questions' : 'Take the short quiz')}</button>${kaynaklar(id)}</main>`;
     // İleri: soruları beklemeden bir sonraki derse geçer (ders okunmuş sayılır); sorular isteğe bağlı
     $('#ileri').onclick = () => { S.biten[id] = 1; serisiYaz(); kaydet(); if (sn) { yigin.pop(); git('ders', sn.x.id); } else { toast(T('Bütün dersleri bitirdin', 'You finished all the lessons')); sekme('yol'); } };
     $('#soru').onclick = () => { Q = { S: karistir(x.sorular), anahtar: id, ileri: sn, baslik: '', renk: d.renk, k: 0, puan: 0 }; git('soru'); };
