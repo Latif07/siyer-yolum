@@ -15,5 +15,6 @@ Peygamberimizin hayatını ve dört halife dönemini adım adım anlatan Capacit
 - `www/js/app.js`: ekran tablosu (`EKRAN`), ekran yığını (`git/geri/sekme`), alt sekme çubuğu. `www/js/data.js`: içerik. `www/js/surum.js`: sürüm ve yenilikler.
 - Dil: `www/js/content-en.js` İngilizce içerik (aynı sıra ve yapı); arayüz metinleri `T(tr, en)` ile. Yeni ders eklenince ikisine de ekle.
 - Kitap sırası: dersler «Siyer-i Nebî» (Habib Yazıcı) içindekiler sırasını izler (`BOLUMLER`, `BOLUM_NO` data-ek.js). Ek dersler `www/js/data-ek.js` (TR) ve `www/js/content-en-2.js` (EN). Kitaptan yalnız bölüm/konu sırası alınır; metin DİA kaynaklıdır, kendi cümlelerimizle.
+- Çizimler: `www/js/cizim.js` (kendi SVG illüstrasyonlarımız; insan figürü yok, Peygamberimiz ve sahâbîler çizilmez). Yeni çizim: `CIZIM[dersId]` ekle, render edip gözle kontrol et.
 - APK: `.github/workflows/apk.yml` (commit mesajına `[apk]` yazılırsa derlenir). Simgeler `android-res/` ve `www/icons/`.
 - Web yayını: `.github/workflows/pages.yml` (GitHub Pages; ayarlarda Pages kaynağı "GitHub Actions" olmalı).

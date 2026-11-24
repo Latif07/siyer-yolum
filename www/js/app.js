@@ -159,6 +159,11 @@
     return `<figure class="harita" style="margin:14px 0">${g}</svg><figcaption>${T('Şematik harita: kıyı çizgisi gerçek verilere dayanır (Natural Earth); yerler ve yollar yaklaşıktır.', 'Schematic map: the coastline is based on real data (Natural Earth); places and routes are approximate.')}</figcaption></figure>`;
   }
 
+  // Kendi çizimlerimiz (SVG): figürsüz, sembolik; anlatımı pekiştirir
+  function cizim(id) {
+    const C = (typeof CIZIM !== 'undefined' && CIZIM[id]); if (!C) return '';
+    return `<figure class="harita cizim" style="margin:14px 0">${C.svg()}<figcaption>${esc(T(C.ad[0], C.ad[1]))} · ${T('Çizim: Siyer Yolum (sembolik, insan figürü yok)', 'Illustration: Seerah Path (symbolic, no human figures)')}</figcaption></figure>`;
+  }
   // Özgür lisanslı görseller (Wikimedia Commons): her görselin altında başlık, yazar, lisans ve kaynak bağlantısı
   function gorsel(id) {
     const G = (typeof GORSEL !== 'undefined' && GORSEL[id]) || []; if (!G.length) return '';
@@ -213,7 +218,7 @@
     const { d, x } = e, v = x[S.mod] || x.buyuk, dt = (typeof DET !== 'undefined' && DET[id]) || {}, sn = sonraki(id);
     app.innerHTML = `${ust(d.ad, true)}<main style="--renk:${d.renk}">
       <span class="chip">${esc(x.yil)}</span><h2 class="ders-baslik">${esc(x.baslik)}</h2>${bolumSatiri(x)}
-      <div class="ozet">${esc(v.ozet)}</div>${harita(id)}${gorsel(id)}${atlas(id)}
+      <div class="ozet">${esc(v.ozet)}</div>${cizim(id)}${harita(id)}${gorsel(id)}${atlas(id)}
       <div class="zaman">${v.olaylar.map(o => `<div class="olay"><b>${o.e ? `<span aria-hidden="true">${o.e}</span>` : ''}${esc(o.b)}</b>${esc(o.m)}${o.k ? `<div class="kaynak">${T('Kaynak', 'Source')}: ${esc(o.k)}</div>` : ''}</div>`).join('')}</div>
       <details class="detay" ${cocuk() ? '' : 'open'}><summary>${ik('kitap')} ${T(cocuk() ? 'Daha çok öğren' : 'Daha fazla bilgi', cocuk() ? 'Learn more' : 'More information')}</summary>
         ${(dt.metin || []).map(m => `<p>${esc(m)}</p>`).join('') || '<p class="soluk">' + T('Bu ders için ayrıntılı anlatım daha sonra eklenecek.', 'A detailed account for this lesson will be added later.') + '</p>'}

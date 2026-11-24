@@ -131,3 +131,4 @@ body[data-mod="cocuk"] .dugum .no { width: 44px; height: 44px; font-size: 1.1rem
 
 .atlas { display: grid; gap: 12px; margin: 14px 0; } .atlas figure { margin: 0; } .atlas img { display: block; width: 100%; height: auto; border-radius: var(--r); border: 1px solid var(--cizgi); } .atlas figcaption { font-size: .75rem; color: var(--soluk); margin-top: 4px; }
 .atlas figcaption a { color: var(--ana); }
+.cizim svg { background: #fff; }
