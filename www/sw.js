@@ -1,6 +1,6 @@
 /* Siyer Yolum: çevrimdışı önbellek. Dosyalar önce ağdan, ağ yoksa önbellekten gelir. */
 const SURUM = 'siyer-SURUM_YER';
-const KABUK = ['./', 'index.html', 'manifest.webmanifest', 'css/app.css', 'js/surum.js', 'js/data.js', 'js/app.js', 'icons/icon-192.png', 'icons/apple-touch-icon.png'];
+const KABUK = ['./', 'index.html', 'manifest.webmanifest', 'css/app.css', 'js/surum.js', 'js/data.js', 'js/content-en.js', 'js/app.js', 'icons/icon-192.png', 'icons/apple-touch-icon.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(SURUM).then(c => c.addAll(KABUK)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(k => Promise.all(k.filter(x => x !== SURUM).map(x => caches.delete(x)))).then(() => self.clients.claim()));

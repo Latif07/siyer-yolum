@@ -116,8 +116,8 @@ main { max-width: 640px; margin: 0 auto; padding: 14px 16px 24px; }
 body[data-mod="cocuk"] .dugum button { border-radius: 999px; border-width: 3px; min-height: 72px; padding: 10px 16px; }
 body[data-mod="cocuk"] .dugum .no { width: 44px; height: 44px; font-size: 1.1rem; }
 /* Soru geri bildirimi: renkle birlikte metin ve çizgi stili (renk körlüğü) */
-.sik.dogru::after { content: "✓ Doğru"; margin-left: auto; font-weight: 700; color: var(--iyi); }
-.sik.yanlis::after { content: "✕ Yanlış"; margin-left: auto; font-weight: 700; color: var(--kotu); }
+.sik.dogru::after { content: attr(data-ek); margin-left: auto; font-weight: 700; color: var(--iyi); }
+.sik.yanlis::after { content: attr(data-ek); margin-left: auto; font-weight: 700; color: var(--kotu); }
 .sik.yanlis { border-style: dashed; }
 .detay summary { min-height: 44px; }
 .harita svg { color: color-mix(in srgb, var(--renk, var(--ana)) calc(100% - var(--acik)), #fff); }

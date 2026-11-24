@@ -30,14 +30,19 @@ const EKRANLAR = [['ana'], ['yol'], ['sinavlar'], ['ilerleme'], ['ben']];
       if (bos) hatalar.push(`bos ekran: ${ad} ${JSON.stringify(arg)}`); else sayi++;
     } catch (e) { hatalar.push(`${ad} ${JSON.stringify(arg)}: ${e.message.split('\n')[0]}`); }
   };
-  for (const mod of ['buyuk', 'cocuk']) {
-    await sayfa.evaluate(m => { window.SY.S.mod = m; }, mod);
+  for (const dil of ['tr', 'en']) for (const mod of ['buyuk', 'cocuk']) {
+    await sayfa.evaluate(([m, d]) => { window.SY.S.mod = m; window.SY.dilAyarla(d); }, [mod, dil]);
     for (const [ad, ...a] of EKRANLAR) await dene(ad, a[0] || []);
     const idler = await sayfa.evaluate(() => window.SY.TUM.map(e => e.x.id));
-    for (const id of idler) await dene('ders', [id]);
+    for (const id of idler) {
+      await dene('ders', [id]);
+      // İngilizcede ders başlığı çevrilmiş olmalı (Türkçe başlıkla aynı olmamalı)
+      if (dil === 'en') { const bsl = await sayfa.evaluate(() => document.querySelector('.ders-baslik') && document.querySelector('.ders-baslik').textContent); const tr = await sayfa.evaluate(i => DONEMLER.flatMap(d => d.dersler).find(x => x.id === i).baslik, id); if (!bsl || bsl === tr) hatalar.push('İngilizce başlık yok: ' + id); }
+    }
     const zler = await sayfa.evaluate(() => SINAVLAR.map(z => z.id));
     for (const z of zler) await dene('sinav', [z]);
   }
+  await sayfa.evaluate(() => window.SY.dilAyarla('tr'));
   // Ders zinciri: İleri ile (soru çözmeden) son derse kadar; sonra bir derste soruları çöz
   await sayfa.evaluate(() => { window.SY.S.mod = 'buyuk'; window.SY.S.biten = {}; window.SY.sekme('yol'); });
   await sayfa.click('[data-ders]');
