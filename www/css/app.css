@@ -133,3 +133,14 @@ body[data-mod="cocuk"] .dugum .no { width: 44px; height: 44px; font-size: 1.1rem
 .atlas figcaption a { color: var(--ana); }
 .cizim svg { background: #fff; }
 .kaynaklar { margin-top: 26px; padding-top: 12px; border-top: 1px solid var(--cizgi); color: var(--soluk); font-size: .8rem; } .kaynaklar h3 { margin: 0 0 6px; font-size: .85rem; text-transform: uppercase; letter-spacing: .04em; } .kaynaklar ul { margin: 0; padding-left: 18px; } .kaynaklar li { margin-bottom: 4px; } .kaynaklar a { color: var(--ana); }
+
+/* Yumuşak geri bildirim: yanlış seçenek kırmızı değil, nötr ve kesikli */
+.sik.yanlis { border-color: var(--cizgi); background: var(--kart); border-style: dashed; } .sik.yanlis::after { color: var(--soluk); font-weight: 600; }
+/* Âyet kartı */
+@font-face { font-family: 'Mushaf'; src: url('../fonts/scheherazade-new-arabic-400-normal.woff2') format('woff2'); font-display: swap; }
+.ayet, .dusun { margin: 18px 0; padding: 14px 16px; border-radius: var(--r); background: var(--kart); border: 1px solid var(--cizgi); }
+.ayet h3, .dusun h3 { margin: 0 0 8px; font-size: .95rem; color: var(--renk, var(--soluk)); }
+.ar { font-family: 'Mushaf', 'Scheherazade New', serif; font-size: 1.6rem; line-height: 2.2; text-align: right; margin: 6px 0 10px; }
+.mealay { margin: 0 0 6px; line-height: 1.6; } .ayet small { color: var(--soluk); }
+.dusun p { margin: 0; line-height: 1.6; font-style: italic; }
+.nazik { text-align: left; } .tekrar-kart { border-left: 4px solid var(--renk, #0f5a47); }

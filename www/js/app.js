@@ -8,7 +8,7 @@
   
   // ------------------------------------------------------------ durum (telefonda saklanır)
   const ANAHTAR = 'siyer-yolum.v1';
-  const S = { mod: 'buyuk', tema: 'oto', biten: {}, sinav: {}, seri: { gun: 0, son: '' } };
+  const S = { mod: 'buyuk', tema: 'oto', biten: {}, sinav: {}, seri: { gun: 0, son: '' }, tekrar: {}, gunluk: { tarih: '', n: 0, devam: 0 } };
   try { Object.assign(S, JSON.parse(localStorage.getItem(ANAHTAR) || '{}')); } catch (e) { }
   if (!S.dil) S.dil = String(navigator.language || 'tr').toLowerCase().startsWith('tr') ? 'tr' : 'en';
   const T = (tr, en) => (S.dil === 'en' ? en : tr);
@@ -36,6 +36,7 @@
     YER = !en ? YERLER : Object.fromEntries(Object.entries(YERLER).map(([k, v]) => [k, Object.assign({}, v, { ad: EN.yer[k] || v.ad })]));
     DET = !en ? DETAY : Object.fromEntries(Object.entries(DETAY).map(([k, v]) => [k, Object.assign({}, v, { metin: (EN.ders[k] && EN.ders[k][6]) || v.metin })]));
     TUM = DON.flatMap(d => d.dersler.map(x => ({ d, x })));
+    TUM.forEach(e => (e.x.sorular || []).forEach((q, i) => { q._k = e.x.id + '#' + i; }));
   }
   yerel();
   function dilAyarla(d) { S.dil = d; yerel(); kaydet(); ciz(); }
@@ -44,6 +45,10 @@
   const sonraki = id => { const i = TUM.findIndex(e => e.x.id === id); return TUM[i + 1] || null; };
   const donemOran = d => { const l = d.dersler; return [l.filter(x => gecti(x.id)).length, l.length]; };
   const gunBugun = () => new Date().toISOString().slice(0, 10);
+  const gunEkle = n => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
+  const ARALIK = [1, 3, 7, 21];
+  const HASSAS_ONAY = {};
+  let MOLA_SONRA = null;
 
   // ------------------------------------------------------------ ikonlar (büyükte çizgi ikon, çocukta emoji)
   const IK = d => `<svg class="ik" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
@@ -177,8 +182,21 @@
     if (HARITA[id]) L.push(`<b>${T('Harita', 'Map')}:</b> ${T('şematik; kıyı çizgisi Natural Earth verisi (kamu malı), yerler ve yollar yaklaşıktır.', 'schematic; coastline from Natural Earth data (public domain), places and routes are approximate.')}`);
     G.forEach(g => L.push(`<b>${T('Fotoğraf', 'Photo')}:</b> ${esc(T(g.baslik[0], g.baslik[1]))} · ${esc(g.yazar)}, ${esc(g.lisans)} · <a href="${esc(g.kaynak)}" target="_blank" rel="noopener">Wikimedia Commons</a>`));
     A.forEach(g => L.push(`<b>${T('Görsel', 'Image')}:</b> ${esc(g.baslik)} · Siyer Atlası, Siyer Vakfı`));
+    const e = ders(id), ks = e ? [...new Set(e.x.buyuk.olaylar.map(o => o.k).filter(Boolean))] : [];
+    if (ks.length) L.push(`<b>${T('Kaynaklar', 'Sources cited')}:</b> ${esc(ks.join('; '))}`);
+    if (typeof AYET !== 'undefined' && AYET[id]) L.push(`<b>${T('Âyet', 'Verse')}:</b> ${T('Arapça metin Tanzil.net’ten, Türkçe meal Diyanet İşleri Başkanlığı’ndan', 'Arabic text from Tanzil.net, translation Saheeh International')} · <a href="https://tanzil.net" target="_blank" rel="noopener">tanzil.net</a>`);
+    L.push(T('Tarihler DİA kronolojisine göredir; “~” tahmini demektir. Farklı rivayet varsa ikisi de yazılır.', 'Dates follow the DİA chronology; “~” means approximate. Where accounts differ, both are given.'));
     if (!L.length) return '';
     return `<section class="kaynaklar" aria-label="${T('Kaynaklar', 'Sources')}"><h3>${T('Kaynaklar', 'Sources')}</h3><ul>${L.map(x => `<li>${x}</li>`).join('')}</ul></section>`;
+  }
+  // Konuyla ilgili âyet (iniş sebebi iddiası değil): Arapça + Diyanet meali / Saheeh International
+  function ayetKarti(id) {
+    const a = typeof AYET !== 'undefined' && AYET[id]; if (!a) return '';
+    return `<section class="ayet"><h3>${T('Konuyla ilgili âyet', 'A related verse')}</h3><p class="ar" dir="rtl" lang="ar">${esc(a.ar.join(' '))}</p><p class="mealay">${esc((S.dil === 'en' ? a.en : a.tr).join(' '))}</p><small>${esc(T(a.ref[0], a.ref[1]))}</small></section>`;
+  }
+  function dusun(id) {
+    const z = typeof DUSUN !== 'undefined' && DUSUN[id]; if (!z) return '';
+    return `<section class="dusun"><h3>${T('Bugün bize ne diyor?', 'What does this say to us today?')}</h3><p>${esc(T(z[0], z[1]))}</p></section>`;
   }
   // Kitaptaki (Siyer-i Nebî) bölüm adı: dersin başlığının altında küçük satır
   function bolumSatiri(x) {
@@ -199,6 +217,7 @@
     app.innerHTML = `${ust(T('Siyer Yolum', 'Seerah Path'), false, modDugme())}<main>
       <p class="selam"><b>${T('Selâmün aleyküm', 'As-salāmu ‘alaykum')}</b><small>${new Date().toLocaleDateString(T('tr-TR', 'en-GB'), { weekday: 'long', day: 'numeric', month: 'long' })}</small></p>
       ${o ? `<section class="bilgi-kart"><small>${T(cocuk() ? 'Günün bilgisi' : 'Günün siyer bilgisi', cocuk() ? 'Fact of the day' : 'Seerah fact of the day')} · ${esc(gun.x.yil)}</small><h2>${esc(o.b)}</h2><p>${esc(o.m)}</p><button class="btn acik dar" data-ders="${gun.x.id}">${T('Dersi aç', 'Open the lesson')} ${ik('ileri')}</button></section>` : ''}
+      ${tekrarSorulari().length ? `<section class="kart tekrar-kart"><h2>${T(cocuk() ? 'Dünden hatırlıyor musun?' : 'Tekrar zamanı', cocuk() ? 'Do you remember from before?' : 'Time to review')}</h2><p class="soluk" style="margin:0 0 12px">${T(tekrarSorulari().length + ' kısa soru', tekrarSorulari().length + ' short questions')}</p><button class="btn" id="tekrar-ac">${T('Başla', 'Start')} ${ik('ileri')}</button></section>` : ''}
       ${sira ? `<section class="kart"><h2>${T(cocuk() ? 'Kaldığımız yer' : 'Devam et', cocuk() ? 'Where we left off' : 'Continue')}</h2><p class="soluk" style="margin:0 0 12px">${T(bitti ? 'Sıradaki ders' : 'İlk ders', bitti ? 'Next lesson' : 'First lesson')}: <b>${esc(sira.x.baslik)}</b></p><button class="btn" data-ders="${sira.x.id}">${T(bitti ? 'Devam et' : 'Başla', bitti ? 'Continue' : 'Start')} ${ik('ileri')}</button></section>` : `<section class="kart"><h2>${T('Maşallah!', 'Well done!')}</h2><p class="soluk" style="margin:0">${T('Bütün dersleri bitirdin. Bölüm sınavlarıyla tekrar yapabilirsin.', 'You finished all the lessons. You can review with the section quizzes.')}</p></section>`}
       <div class="bolumler">
         <button class="bolum" data-git="yol"><span class="halka" style="--p:${Math.round(bitti / tum * 100)}"><b>${bitti}/${tum}</b></span><span class="bad"><small>${sira ? T('Sıradaki: ', 'Next: ') + esc(sira.x.baslik) : T('Hepsi tamam', 'All done')}</small>${T('Siyer yolu', 'Seerah path')}</span><span class="ok">›</span></button>
@@ -206,6 +225,7 @@
         <button class="bolum" data-git="ilerleme"><span class="ikon">${ik('ilerleme')}</span><span class="bad"><small>${S.seri.gun ? T(S.seri.gun + ' günlük seri', S.seri.gun + '-day streak') : T('Gelişimin', 'Your growth')}</small>${T('İlerleme', 'Progress')}</span><span class="ok">›</span></button>
       </div>
       <p class="soluk kucukyazi" style="text-align:center;margin-top:18px">${T(esc(SURUM_BILGI.SURUM) + ' sürümü', 'Version ' + esc(SURUM_BILGI.SURUM))}</p></main>`;
+    const ta = $('#tekrar-ac'); if (ta) ta.onclick = () => git('tekrar');
     modBagla(); app.querySelectorAll('[data-ders]').forEach(b => b.onclick = () => git('ders', b.dataset.ders));
     // sekme düğmeleri (data-git) ciz() içinde bağlanır; alt menü dışındaki "yol/sinavlar/ilerleme" üst düzeye gider
     app.querySelectorAll('.bolum[data-git]').forEach(b => b.onclick = () => (b.dataset.git === 'ilerleme' ? git('ilerleme') : sekme(b.dataset.git)));
@@ -227,10 +247,21 @@
   EKRAN.ders = function (id) {
     const e = ders(id); if (!e) return geri();
     const { d, x } = e, v = x[S.mod] || x.buyuk, dt = (typeof DET !== 'undefined' && DET[id]) || {}, sn = sonraki(id);
+    if (cocuk() && typeof HASSAS !== 'undefined' && HASSAS.includes(id) && !HASSAS_ONAY[id]) {
+      app.innerHTML = `${ust(d.ad, true)}<main style="--renk:${d.renk}"><span class="chip">${esc(x.yil)}</span><h2 class="ders-baslik">${esc(x.baslik)}</h2>
+        <section class="kart nazik"><h2>${T('Bu ders biraz hüzünlü 🤍', 'This lesson is a little sad 🤍')}</h2><p class="soluk">${T('Bir büyüğünle birlikte okumak istersin belki. İstersen sonraki derse geçebilirsin.', 'You may want to read it together with a grown-up. You can also move on to the next lesson.')}</p></section>
+        <button class="btn" id="birlikte">${T('Birlikte okuyalım', 'Let’s read together')}</button>
+        <button class="btn ikincil" id="atla">${T('Sonraki derse geç', 'Skip to the next lesson')}</button></main>`;
+      $('#birlikte').onclick = () => { HASSAS_ONAY[id] = 1; ciz(); window.scrollTo(0, 0); };
+      $('#atla').onclick = () => { if (sn) { yigin.pop(); git('ders', sn.x.id); } else geri(); };
+      return;
+    }
+    const tarih = /~/.test(x.yil) ? ' · ' + T('tahmini', 'approximate') : (['fil', 'hatice'].includes(id) ? ' · ' + T('rivayetlere göre', 'according to reports') : '');
     app.innerHTML = `${ust(d.ad, true)}<main style="--renk:${d.renk}">
-      <span class="chip">${esc(x.yil)}</span><h2 class="ders-baslik">${esc(x.baslik)}</h2>${bolumSatiri(x)}
+      <span class="chip">${esc(x.yil)}${tarih}</span><h2 class="ders-baslik">${esc(x.baslik)}</h2>${bolumSatiri(x)}
       <div class="ozet">${esc(v.ozet)}</div>${cizim(id)}${harita(id)}${gorsel(id)}${atlas(id)}
       <div class="zaman">${v.olaylar.map(o => `<div class="olay"><b>${o.e ? `<span aria-hidden="true">${o.e}</span>` : ''}${esc(o.b)}</b>${esc(o.m)}${o.k ? `<div class="kaynak">${T('Kaynak', 'Source')}: ${esc(o.k)}</div>` : ''}</div>`).join('')}</div>
+      ${ayetKarti(id)}${dusun(id)}
       <details class="detay" ${cocuk() ? '' : 'open'}><summary>${ik('kitap')} ${T(cocuk() ? 'Daha çok öğren' : 'Daha fazla bilgi', cocuk() ? 'Learn more' : 'More information')}</summary>
         ${(dt.metin || []).map(m => `<p>${esc(m)}</p>`).join('') || '<p class="soluk">' + T('Bu ders için ayrıntılı anlatım daha sonra eklenecek.', 'A detailed account for this lesson will be added later.') + '</p>'}
         ${(dt.sv || []).length ? `<p class="baslik" style="margin:16px 0 8px">${T('Siyer Vakfı dersleri', 'Siyer Foundation lectures (in Turkish)')}</p>${dt.sv.map(v => `<div class="kaynak-kart"><b>${esc(v.baslik)}</b><small>${esc(v.kisi)}</small><div class="kaynak-btn">${v.video ? `<a class="video" href="${esc(v.video)}" target="_blank" rel="noopener">${ik('video')} ${T('Videoyu izle', 'Watch the video')}</a>` : ''}<a class="lnk" href="${esc(v.sayfa)}" target="_blank" rel="noopener">${T('Ders sayfası', 'Lecture page')}</a>${v.pdf ? `<a class="lnk" href="${esc(v.pdf)}" target="_blank" rel="noopener">${T('Ders notu (PDF)', 'Lecture notes (PDF)')}</a>` : ''}</div></div>`).join('')}` : ''}
@@ -239,7 +270,7 @@
       <button class="btn" id="ileri">${T(sn ? 'İleri' : 'Bitir', sn ? 'Next' : 'Finish')} ${ik('ileri')}</button>
       <button class="btn ikincil" id="soru">${T(cocuk() ? 'Soruları çözelim' : 'Kısa soruları çöz', cocuk() ? 'Let’s solve the questions' : 'Take the short quiz')}</button>${kaynaklar(id)}</main>`;
     // İleri: soruları beklemeden bir sonraki derse geçer (ders okunmuş sayılır); sorular isteğe bağlı
-    $('#ileri').onclick = () => { S.biten[id] = 1; serisiYaz(); kaydet(); if (sn) { yigin.pop(); git('ders', sn.x.id); } else { toast(T('Bütün dersleri bitirdin', 'You finished all the lessons')); sekme('yol'); } };
+    $('#ileri').onclick = () => { bitir(id); sonrakineGit(sn, sn ? 1 : 0); };
     $('#soru').onclick = () => { Q = { S: karistir(x.sorular), anahtar: id, ileri: sn, baslik: '', renk: d.renk, k: 0, puan: 0 }; git('soru'); };
   };
 
@@ -247,27 +278,47 @@
   let Q = null;
   const karistir = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   const havuz = z => DON.filter(d => z.donemler.includes(d.id)).flatMap(d => d.dersler).flatMap(x => x.sorular || []);
+  function bitir(id) {
+    if (!S.biten[id]) { if (S.gunluk.tarih !== gunBugun()) S.gunluk = { tarih: gunBugun(), n: 0, devam: 0 }; S.gunluk.n++; }
+    S.biten[id] = 1; serisiYaz(); kaydet();
+  }
+  // çocuk modunda günde 3 dersten sonra nazik mola
+  const molaMi = () => cocuk() && S.gunluk.tarih === gunBugun() && S.gunluk.n >= 3 && !S.gunluk.devam;
+  function sonrakineGit(sn, pop) {
+    for (let i = 0; i < pop; i++) yigin.pop();
+    if (sn && molaMi()) { MOLA_SONRA = sn; git('mola'); } else if (sn) git('ders', sn.x.id); else { toast(T('Bütün dersleri bitirdin', 'You finished all the lessons')); sekme('yol'); }
+  }
+  function tekrarYaz(q, dogru) {
+    if (!q._k) return;
+    const r = S.tekrar[q._k], lvl = dogru ? (r ? Math.min(r.lvl + 1, 3) : 0) : 0;
+    S.tekrar[q._k] = { lvl, due: gunEkle(dogru ? ARALIK[lvl] : 1) };
+  }
+  function tekrarSorulari() {
+    const b = gunBugun(), l = [];
+    Object.entries(S.tekrar).forEach(([k, r]) => { if (r.due <= b) { const [id, i] = k.split('#'), e = ders(id), q = e && e.x.sorular && e.x.sorular[+i]; if (q) l.push(q); } });
+    return l.slice(0, 3);
+  }
   function serisiYaz() {
     const b = gunBugun(); if (S.seri.son === b) return;
-    const dun = new Date(Date.now() - 864e5).toISOString().slice(0, 10);
-    S.seri = { gun: S.seri.son === dun ? S.seri.gun + 1 : 1, son: b };
+    // bir gün ara verilse de seri sürer (dünden veya evvelsi günden)
+    S.seri = { gun: (S.seri.son === gunEkle(-1) || S.seri.son === gunEkle(-2)) ? S.seri.gun + 1 : 1, son: b };
   }
   EKRAN.soru = function () {
     if (!Q) return sekme('ana');
-    const ders_ = ders(Q.anahtar), sinavMi = Q.anahtar.startsWith('s-');
+    const ders_ = ders(Q.anahtar), sinavMi = Q.anahtar.startsWith('s-'), tekrarMi = Q.anahtar === 't-tekrar';
     const renk = Q.renk || '#0f5a47';
     if (Q.k >= Q.S.length) {
-      if (sinavMi) S.sinav[Q.anahtar] = Math.max(S.sinav[Q.anahtar] || 0, Q.puan); else { S.biten[Q.anahtar] = 1; serisiYaz(); }
+      if (tekrarMi) { serisiYaz(); } else if (sinavMi) S.sinav[Q.anahtar] = Math.max(S.sinav[Q.anahtar] || 0, Q.puan); else bitir(Q.anahtar);
       kaydet();
       const iyi = Q.puan >= Q.S.length * 0.7;
       app.innerHTML = `${ust(Q.baslik || (ders_ && ders_.x.baslik) || T('Sınav', 'Quiz'), true)}<main style="--renk:${renk}"><div class="sonuc"><div class="buyuk" aria-hidden="true">${cocuk() ? (iyi ? '🏆' : '💪') : ''}</div><h2>${Q.puan} / ${Q.S.length} ${T('doğru', 'correct')}</h2>
         <p class="soluk">${iyi ? T(cocuk() ? 'Aferin!' : 'Ders tamamlandı.', cocuk() ? 'Well done!' : 'Lesson completed.') : T('Konuyu bir daha okuyup tekrar deneyebilirsin.', 'You can read the topic again and retry.')}</p></div>
         ${Q.ileri ? `<button class="btn" id="sonraki">${T('Sonraki ders', 'Next lesson')}: ${esc(Q.ileri.x.baslik)} ${ik('ileri')}</button>` : ''}
-        ${sinavMi ? `<button class="btn" id="tekrar">${T('Yeniden dene', 'Try again')}</button>` : ''}
-        <button class="btn ikincil" id="yola">${T(sinavMi ? 'Sınavlara dön' : 'Yola dön', sinavMi ? 'Back to quizzes' : 'Back to the path')}</button></main>`;
-      const sn = $('#sonraki'); if (sn) sn.onclick = () => { yigin.pop(); yigin.pop(); git('ders', Q.ileri.x.id); };
+        ${sinavMi && !tekrarMi ? `<button class="btn" id="tekrar">${T('Yeniden dene', 'Try again')}</button>` : ''}
+        <button class="btn ikincil" id="yola">${tekrarMi ? T('Ana ekrana dön', 'Back to home') : T(sinavMi ? 'Sınavlara dön' : 'Yola dön', sinavMi ? 'Back to quizzes' : 'Back to the path')}</button></main>`;
+      const sn = $('#sonraki'); if (sn) sn.onclick = () => sonrakineGit(Q.ileri, 2);
       const tk = $('#tekrar'); if (tk) tk.onclick = () => { Q = Object.assign({}, Q, { S: karistir(Q.S), k: 0, puan: 0 }); ciz(); window.scrollTo(0, 0); };
-      $('#yola').onclick = () => sekme(sinavMi ? 'sinavlar' : 'yol');
+      $('#yola').onclick = () => sekme(tekrarMi ? 'ana' : sinavMi ? 'sinavlar' : 'yol');
       return;
     }
     const q = Q.S[Q.k];
@@ -278,15 +329,29 @@
     const sira = karistir(q.sec.map((s, i) => i));
     sira.forEach(i => { const b = document.createElement('button'); b.className = 'sik'; b.textContent = q.sec[i];
       b.onclick = () => {
-        app.querySelectorAll('.sik').forEach(e => { e.disabled = true; if (e.dataset.i == q.d) { e.classList.add('dogru'); e.dataset.ek = '✓ ' + T('Doğru', 'Correct'); } });
-        if (i !== q.d) { b.classList.add('yanlis'); b.dataset.ek = '✕ ' + T('Yanlış', 'Wrong'); } else Q.puan++;
-        $('#ac').textContent = (i === q.d ? T('Doğru. ', 'Correct. ') : T('Yanlış. ', 'Wrong. ')) + q.a;
+        app.querySelectorAll('.sik').forEach(e => { e.disabled = true; if (e.dataset.i == q.d) { e.classList.add('dogru'); e.dataset.ek = '✓ ' + T('Doğru cevap', 'Correct answer'); } });
+        if (i !== q.d) { b.classList.add('yanlis'); b.dataset.ek = T('Bu değil', 'Not this one'); } else Q.puan++;
+        tekrarYaz(q, i === q.d); kaydet();
+        $('#ac').textContent = (i === q.d ? T('Doğru. ', 'Correct. ') : T('Olsun, doğru cevaba birlikte bakalım. ', 'That’s okay, let’s look at the answer together. ')) + q.a;
         const n = document.createElement('button'); n.className = 'btn'; n.innerHTML = `${T(Q.k + 1 >= Q.S.length ? 'Bitir' : 'Devam', Q.k + 1 >= Q.S.length ? 'Finish' : 'Continue')} ${ik('ileri')}`;
         n.onclick = () => { Q.k++; ciz(); window.scrollTo(0, 0); }; $('#dev').append(n); n.focus();
       };
       b.dataset.i = i; $('#sec').append(b); });
   };
 
+  EKRAN.tekrar = function () {
+    const l = tekrarSorulari(); if (!l.length) return sekme('ana');
+    Q = { S: l, anahtar: 't-tekrar', ileri: null, baslik: T(cocuk() ? 'Dünden hatırlıyor musun?' : 'Kısa tekrar', cocuk() ? 'Do you remember?' : 'Quick review'), renk: '#0f5a47', k: 0, puan: 0 };
+    yigin[yigin.length - 1] = ['soru', []]; ciz(); window.scrollTo(0, 0);
+  };
+  EKRAN.mola = function () {
+    const sn = MOLA_SONRA;
+    app.innerHTML = `${ust(T('Mola', 'Break'), false)}<main><section class="kart nazik" style="text-align:center"><div class="buyuk" aria-hidden="true" style="font-size:3rem">🌙</div><h2>${T('Bugünlük bu kadar, yarın devam edelim', 'That’s enough for today, let’s continue tomorrow')}</h2><p class="soluk">${T('Üç ders okudun, harikasın. Biraz dinlenmek de güzeldir.', 'You read three lessons, well done. A little rest is nice too.')}</p></section>
+      <button class="btn" id="ana">${T('Ana ekrana dön', 'Back to home')}</button>
+      ${sn ? `<button class="btn ikincil" id="devam">${T('Yine de bir ders daha', 'One more lesson anyway')}</button>` : ''}</main>`;
+    $('#ana').onclick = () => sekme('ana');
+    const dv = $('#devam'); if (dv) dv.onclick = () => { S.gunluk.devam = 1; kaydet(); yigin.pop(); git('ders', sn.x.id); };
+  };
   EKRAN.sinavlar = function () {
     app.innerHTML = `${ust(T('Sınavlar', 'Quizzes'), false, modDugme())}<main><p class="soluk" style="margin-top:0">${T('Soruları ilgili derslerden gelir. Her seferinde karışık.', 'Questions come from the related lessons, shuffled every time.')}</p>
       ${SIN.map(z => { const n = havuz(z).length, en = S.sinav[z.id], say = Math.min(10, n);
