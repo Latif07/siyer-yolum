@@ -159,6 +159,12 @@
     return `<figure class="harita" style="margin:14px 0">${g}</svg><figcaption>${T('Şematik harita: kıyı çizgisi gerçek verilere dayanır (Natural Earth); yerler ve yollar yaklaşıktır.', 'Schematic map: the coastline is based on real data (Natural Earth); places and routes are approximate.')}</figcaption></figure>`;
   }
 
+  // Siyer Atlası görselleri (ATLAS boşsa hiçbir şey çizilmez)
+  function atlas(id) {
+    const A = (typeof ATLAS !== 'undefined' && ATLAS[id]) || []; if (!A.length) return '';
+    return `<div class="atlas">${A.map(g => `<figure><img src="${esc(g.dosya)}" alt="${esc(g.baslik)}" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>${esc(g.baslik)} · Siyer Atlası, Siyer Vakfı</figcaption></figure>`).join('')}</div>`;
+  }
+
   // ------------------------------------------------------------ ekranlar
   EKRAN.ana = function () {
     const tum = TUM.length, bitti = TUM.filter(e => gecti(e.x.id)).length, sira = siradaki();
@@ -196,7 +202,7 @@
     const { d, x } = e, v = x[S.mod] || x.buyuk, dt = (typeof DET !== 'undefined' && DET[id]) || {}, sn = sonraki(id);
     app.innerHTML = `${ust(d.ad, true)}<main style="--renk:${d.renk}">
       <span class="chip">${esc(x.yil)}</span><h2 class="ders-baslik">${esc(x.baslik)}</h2>
-      <div class="ozet">${esc(v.ozet)}</div>${harita(id)}
+      <div class="ozet">${esc(v.ozet)}</div>${harita(id)}${atlas(id)}
       <div class="zaman">${v.olaylar.map(o => `<div class="olay"><b>${o.e ? `<span aria-hidden="true">${o.e}</span>` : ''}${esc(o.b)}</b>${esc(o.m)}${o.k ? `<div class="kaynak">${T('Kaynak', 'Source')}: ${esc(o.k)}</div>` : ''}</div>`).join('')}</div>
       <details class="detay" ${cocuk() ? '' : 'open'}><summary>${ik('kitap')} ${T(cocuk() ? 'Daha çok öğren' : 'Daha fazla bilgi', cocuk() ? 'Learn more' : 'More information')}</summary>
         ${(dt.metin || []).map(m => `<p>${esc(m)}</p>`).join('') || '<p class="soluk">' + T('Bu ders için ayrıntılı anlatım daha sonra eklenecek.', 'A detailed account for this lesson will be added later.') + '</p>'}

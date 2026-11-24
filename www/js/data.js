@@ -525,3 +525,9 @@ const DETAY={
   ,dia:[DIA('ali','Ali'),DIA('cemel-vakasi','Cemel Vak‘ası'),DIA('siffin-savasi','Sıffîn Savaşı'),DIA('kufe','Kûfe')],
   sv:[SV('hz-ali-ra-ve-donemi-prof-dr-unal-kilic','OzzMvpB6LYk','Hz. Ali (ra) ve Dönemi','Prof. Dr. Ünal Kılıç')]}
 };
+
+/* ===== SİYER ATLASI GÖRSELLERİ (yalnızca kendi kullanımımız) =====
+ Görsel dosyaları www/img/atlas/ klasörüne konur (klasör .gitignore'dadır, GitHub'a ve web yayınına gitmez).
+ ATLAS[dersId] = [{dosya:'img/atlas/hicret-1.jpg', baslik:'Hicret güzergâhı'}, ...]
+ Dosya yoksa görsel gösterilmez; ders ekranı bozulmaz. İzin alınırsa .gitignore satırı kaldırılır. */
+const ATLAS={};
