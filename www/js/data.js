@@ -531,3 +531,200 @@ const DETAY={
  ATLAS[dersId] = [{dosya:'img/atlas/hicret-1.jpg', baslik:'Hicret güzergâhı'}, ...]
  Dosya yoksa görsel gösterilmez; ders ekranı bozulmaz. İzin alınırsa .gitignore satırı kaldırılır. */
 const ATLAS={};
+
+/* ===== ÖZGÜR LİSANSLI GÖRSELLER (Wikimedia Commons) =====
+ Lisanslar tek tek kontrol edildi: kamu malı, CC0, CC BY, CC BY-SA. Her görselin altında yazar, lisans ve kaynak bağlantısı gösterilir.
+ GORSEL[dersId] = [{dosya, baslik:[tr,en], yazar, lisans, kaynak}] — dosyalar www/img/foto/ içinde.
+ Not: Osmanlı Siyer-i Nebî minyatürleri (kamu malı) da Commons'ta var; Peygamberimizi tasvir ettikleri için bilerek kullanılmadı. */
+const GORSEL={
+ "fil": [
+  {
+   "dosya": "img/foto/fil-1.jpg",
+   "baslik": [
+    "Kâbe",
+    "The Ka‘ba"
+   ],
+   "yazar": "Moataz Egbaria (معتز اغبارية)",
+   "lisans": "CC BY-SA 3.0",
+   "kaynak": "https://commons.wikimedia.org/wiki/File:Kaaba,_Makkah3.jpg"
+  }
+ ],
+ "fetih": [
+  {
+   "dosya": "img/foto/fil-1.jpg",
+   "baslik": [
+    "Kâbe",
+    "The Ka‘ba"
+   ],
+   "yazar": "Moataz Egbaria (معتز اغبارية)",
+   "lisans": "CC BY-SA 3.0",
+   "kaynak": "https://commons.wikimedia.org/wiki/File:Kaaba,_Makkah3.jpg"
+  }
+ ],
+ "hacer": [
+  {
+   "dosya": "img/foto/hacer-1.jpg",
+   "baslik": [
+    "Hacerülesved",
+    "The Black Stone"
+   ],
+   "yazar": "omar_chatriwala",
+   "lisans": "CC BY 2.0",
+   "kaynak": "https://commons.wikimedia.org/wiki/File:Coveting_the_Black_Stone.jpg"
+  }
+ ],
+ "hira": [
+  {
+   "dosya": "img/foto/hira-1.jpg",
+   "baslik": [
+    "Hira Mağarası",
+    "The Cave of Hira"
+   ],
+   "yazar": "saudipics",
+   "lisans": "CC BY-SA 4.0",
+   "kaynak": "https://commons.wikimedia.org/wiki/File:Hira_Cave.jpg"
+  }
+ ],
+ "acik": [
+  {
+   "dosya": "img/foto/acik-1.jpg",
+   "baslik": [
+    "Safâ Tepesi (Mescid-i Harâm içinde)",
+    "Mount Safa (inside the Sacred Mosque)"
+   ],
+   "yazar": "Swerveut (talk)",
+   "lisans": "CC BY-SA 3.0",
+   "kaynak": "https://commons.wikimedia.org/wiki/File:Mount_Safa_Mecca.jpg"
+  }
+ ],
+ "habese": [
+  {
+   "dosya": "img/foto/habese-1.jpg",
+   "baslik": [
+    "Aksum (Habeşistan) dikilitaşları",
+    "Stelae of Aksum (Abyssinia)"
+   ],
+   "yazar": "Adam Jones from Kelowna, BC, Canada",
+   "lisans": "CC BY-SA 2.0",
+   "kaynak": "https://commons.wikimedia.org/wiki/File:Stela_in_Main_Stelae_Field_-_Axum_(Aksum)_-_Ethiopia_-_01_(8701108913).jpg"
+  }
+ ],
+ "sam": [
+  {
+   "dosya": "img/foto/sam-1.jpg",
+   "baslik": [
+    "Busrâ (Bosra) kalıntıları",
+    "The ruins of Busra"
+   ],
+   "yazar": "Jacky Lee",
+   "lisans": "CC BY 3.0",
+   "kaynak": "https://commons.wikimedia.org/wiki/File:Roman_amphitheatre_in_Bosra_-_panoramio.jpg"
+  }
+ ],
+ "isra": [
+  {
+   "dosya": "img/foto/isra-1.jpg",
+   "baslik": [
+    "Mescid-i Aksâ",
+    "Masjid al-Aqsa"
+   ],
+   "yazar": "Godot13",
+   "lisans": "CC BY-SA 4.0",
+   "kaynak": "https://commons.wikimedia.org/wiki/File:Jerusalem-2013-Temple_Mount-Al-Aqsa_Mosque_01.jpg"
+  }
+ ],
+ "hicret": [
+  {
+   "dosya": "img/foto/hicret-1.jpg",
+   "baslik": [
+    "Sevr Dağı",
+    "Mount Thawr"
+   ],
+   "yazar": "Yousefmadari at ml.wikipedia",
+   "lisans": "Public domain",
+   "kaynak": "https://commons.wikimedia.org/wiki/File:Mount_sour1.jpg"
+  },
+  {
+   "dosya": "img/foto/hicret-2.jpg",
+   "baslik": [
+    "Kubâ Mescidi",
+    "Quba Mosque"
+   ],
+   "yazar": "Kaliper1",
+   "lisans": "CC BY-SA 4.0",
+   "kaynak": "https://commons.wikimedia.org/wiki/File:Quba_Mosque_(2024).jpg"
+  }
+ ],
+ "medine-ilk": [
+  {
+   "dosya": "img/foto/medine-ilk-1.jpg",
+   "baslik": [
+    "Mescid-i Nebevî",
+    "The Prophet’s Mosque"
+   ],
+   "yazar": "Meshari Alawfi",
+   "lisans": "CC BY 4.0",
+   "kaynak": "https://commons.wikimedia.org/wiki/File:Al-Masjid_an_Nabawi.jpg"
+  }
+ ],
+ "uhud": [
+  {
+   "dosya": "img/foto/uhud-1.jpg",
+   "baslik": [
+    "Uhud Dağı",
+    "Mount Uhud"
+   ],
+   "yazar": "Ahmed",
+   "lisans": "CC BY 4.0",
+   "kaynak": "https://commons.wikimedia.org/wiki/File:Mount_Uhud,_Medina,_20241002_091210_028.jpg"
+  }
+ ],
+ "veda": [
+  {
+   "dosya": "img/foto/veda-1.jpg",
+   "baslik": [
+    "Arafat, Rahmet Dağı",
+    "Arafat, Mount of Mercy"
+   ],
+   "yazar": "Edibiz",
+   "lisans": "CC0",
+   "kaynak": "https://commons.wikimedia.org/wiki/File:Mount_Arafat(Jabal_ar-Raḥmah).jpg"
+  }
+ ],
+ "omer": [
+  {
+   "dosya": "img/foto/omer-1.jpg",
+   "baslik": [
+    "Kudüs’teki Ömer Camii",
+    "The Mosque of Omar in Jerusalem"
+   ],
+   "yazar": "Hoshvilim",
+   "lisans": "CC BY-SA 4.0",
+   "kaynak": "https://commons.wikimedia.org/wiki/File:Mosque_of_Omar,_Jerusalem,_01.jpg"
+  }
+ ],
+ "osman": [
+  {
+   "dosya": "img/foto/osman-1.jpg",
+   "baslik": [
+    "Hz. Osman’a nisbet edilen mushaf (Taşkent); nisbet geleneksel bir rivayettir",
+    "The mushaf traditionally attributed to Uthman (Tashkent)"
+   ],
+   "yazar": "Wiggum",
+   "lisans": "CC BY-SA 3.0",
+   "kaynak": "https://commons.wikimedia.org/wiki/File:Uthman_Koran_Taschkent_a.jpg"
+  }
+ ],
+ "ali": [
+  {
+   "dosya": "img/foto/ali-1.jpg",
+   "baslik": [
+    "Kûfe Camii",
+    "The Mosque of Kufa"
+   ],
+   "yazar": "Ali Alturaihy",
+   "lisans": "CC BY-SA 4.0",
+   "kaynak": "https://commons.wikimedia.org/wiki/File:Kufa_Mosque.jpg"
+  }
+ ]
+};
