@@ -186,4 +186,101 @@ const BOLUM_NO = { 'siyer-ilmi': 1, 'mekke-kabe': 2, 'mekke-toplum': 2, fil: 3, 
     cocuklar: { metin: ['Hz. Hatice’den sekiz çocuğu olduğu, oğullarının sayısının üç olduğu da söylenir. Peygamberlikten önce doğan ilk oğlu ve ilk ölen çocuğu Kâsım’dır; onun ardından sırasıyla Zeyneb, Rukıyye, Ümmü Külsûm ve Fâtıma doğdu. Tayyib ile Tâhir’in, Abdullah adlı bir oğlunun lakapları olduğu da rivayet edilmiştir.', 'Rukıyye’nin vefatı Ramazan 2’de (Mart 624), Hz. Osman’ın Ümmü Külsûm ile evlenmesi Rebîülevvel 3’te, Hz. Ali ile Fâtıma’nın evliliği 2. yılın Zilkade’sinde, Zeyneb’in vefatı Safer 8’de kayıtlıdır. Oğlu İbrâhim Mâriye’den doğdu; vefatı 29 Şevval 10’da (28 Ocak 632) güneş tutulması sırasında oldu.'], dia: [DIA('hatice', 'Hatice'), DIA('muhammed', 'Muhammed (kronoloji)')], sv: [SV('en-ideal-cocuk-muhammed-emin-yildirim', '2Q41IywvWGM', 'En İdeal Çocuk', 'Muhammed Emin Yıldırım'), SV('baba-olarak-hz-peygamber-sas-doc-dr-erdinc-ahatli', 'QxCmOcsLzDg', 'Baba Olarak Hz. Peygamber (sas)', 'Doç. Dr. Erdinç Ahatlı')] },
     iliskiler: { metin: ['Müminlerle ilişki: Medine’ye hicretten sonra Mescid-i Nebevî toplumsal hayatın merkezi oldu; muhacir ve ensar arasında kardeşlik (muâhât) kuruldu. Müşriklerle ilişki: Medine döneminde Bedir, Uhud ve Hendek gibi karşılaşmalar yaşandı; Hudeybiye ile barış yolu açıldı ve Mekke’nin fethinde genel af ilân edildi.', 'Ehl-i Kitapla ilişki: Medine Vesikası müslümanlar, yahudiler ve müşrik Araplar arasında hazırlandı. Hıristiyanlarla ilişkide Habeş Necâşîsi Ashame’nin müslüman olması, Tebük’te Eyle piskoposu Yuhannâ b. Rü’be’nin cizye anlaşması örnek verilebilir. Medine kronolojisi ve DİA maddeleri bu ilişkilerin ayrıntılı bir resmini verir.'], dia: [DIA('medine-vesikasi', 'Medine Vesikası'), DIA('muahat', 'Muâhât'), DIA('ehl-i-kitap', 'Ehl-i Kitap')], sv: [SV('medine-doneminde-mekke-musrikleriyle-iliskiler-prof-dr-m-ali-kapar', 'S0eQw4xIRoA', 'Medine Döneminde Mekke Müşrikleriyle İlişkiler', 'Prof. Dr. M. Ali Kapar', 'https://siyervakfi.org/dokuman/iman-sehri-medine/ders-9-prof-dr-m-ali-kapar.pdf'), SV('medine-doneminde-diger-musriklerle-iliskiler-prof-dr-adem-apak', '1oseb6wvLso', 'Medine Döneminde Diğer Müşriklerle İlişkiler', 'Prof. Dr. Adem Apak', 'https://siyervakfi.org/dokuman/iman-sehri-medine/ders-11-prof-dr-adem-apak.pdf'), SV('medine-doneminde-yahudilerle-iliskiler-prof-dr-nuh-arslantas', 'Oc9vWaI4uNc', 'Medine Döneminde Yahudilerle İlişkiler', 'Prof. Dr. Nuh Arslantaş', 'https://siyervakfi.org/dokuman/iman-sehri-medine/ders-10-prof-dr-nuh-arslantas.pdf')] }
   });
+
+  Object.assign(GORSEL, {
+ "hayber": [
+  {
+   "dosya": "img/foto/hayber-1.jpg",
+   "baslik": [
+    "Hayber kalelerinden görünüm",
+    "A view over the fortress of Khaybar"
+   ],
+   "yazar": "Hardscarf",
+   "lisans": "CC BY-SA 4.0",
+   "kaynak": "https://commons.wikimedia.org/wiki/File:Khaybar_-_view_over_the_fortress.jpg"
+  }
+ ],
+ "mektuplar": [
+  {
+   "dosya": "img/foto/mektuplar-1.jpg",
+   "baslik": [
+    "Resûlullah’ın Mısır Mukavkısı’na mektubu (Topkapı Sarayı Müzesi)",
+    "The Prophet’s letter to the Muqawqis of Egypt (Topkapı Palace Museum)"
+   ],
+   "yazar": "Benjaminkhas07",
+   "lisans": "CC BY-SA 4.0",
+   "kaynak": "https://commons.wikimedia.org/wiki/File:Letter_of_Prophet_Muhammad_to_the_Muqawqis_of_egypt_-_Topkapi_Palace_Museum.jpg"
+  },
+  {
+   "dosya": "img/foto/mektuplar-2.jpg",
+   "baslik": [
+    "Resûlullah’ın Necâşî’ye mektubu",
+    "The Prophet’s letter to the Negus"
+   ],
+   "yazar": "Zak.kapadia",
+   "lisans": "CC BY-SA 4.0",
+   "kaynak": "https://commons.wikimedia.org/wiki/File:Najjasi1.jpg"
+  }
+ ],
+ "hudeybiye": [
+  {
+   "dosya": "img/foto/hudeybiye-1.jpg",
+   "baslik": [
+    "Hudeybiye Mescidi",
+    "The Hudaybiyya Mosque"
+   ],
+   "yazar": "GusJuned",
+   "lisans": "CC BY-SA 3.0",
+   "kaynak": "https://commons.wikimedia.org/wiki/File:Hudaibiyah_Mosque_-_panoramio.jpg"
+  }
+ ],
+ "mekke-kabe": [
+  {
+   "dosya": "img/foto/mekke-kabe-1.jpg",
+   "baslik": [
+    "Mescid-i Harâm, 1889 (Snouck Hurgronje)",
+    "The Sacred Mosque in 1889 (Snouck Hurgronje)"
+   ],
+   "yazar": "C. Snouck Hurgronje",
+   "lisans": "Public domain",
+   "kaynak": "https://commons.wikimedia.org/wiki/File:Masjid_Haram_1889_Snouck_Hurgronje.jpg"
+  }
+ ],
+ "tebuk": [
+  {
+   "dosya": "img/foto/tebuk-1.jpg",
+   "baslik": [
+    "Tebük Kalesi",
+    "Tabuk Fortress"
+   ],
+   "yazar": "amanderson2",
+   "lisans": "CC BY 2.0",
+   "kaynak": "https://commons.wikimedia.org/wiki/File:Tabuk_Fortress_2022.jpg"
+  }
+ ],
+ "hendek": [
+  {
+   "dosya": "img/foto/hendek-1.jpg",
+   "baslik": [
+    "Selmân-ı Fârisî Mescidi (Hendek bölgesi, Medine)",
+    "The Mosque of Salman al-Farisi (Trench area, Medina)"
+   ],
+   "yazar": "marviikad",
+   "lisans": "CC BY-SA 2.0",
+   "kaynak": "https://commons.wikimedia.org/wiki/File:Mosque_Salman_Al_farissi.jpg"
+  }
+ ],
+ "kaza": [
+  {
+   "dosya": "img/foto/fil-1.jpg",
+   "baslik": [
+    "Kâbe (umre burada yapılır)",
+    "The Ka‘ba (where umra is performed)"
+   ],
+   "yazar": "Moataz Egbaria (معتز اغبارية)",
+   "lisans": "CC BY-SA 3.0",
+   "kaynak": "https://commons.wikimedia.org/wiki/File:Kaaba,_Makkah3.jpg"
+  }
+ ]
+});
 })();
