@@ -164,6 +164,12 @@
     const G = (typeof GORSEL !== 'undefined' && GORSEL[id]) || []; if (!G.length) return '';
     return `<div class="atlas">${G.map(g => `<figure><img src="${esc(g.dosya)}" alt="${esc(T(g.baslik[0], g.baslik[1]))}" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>${esc(T(g.baslik[0], g.baslik[1]))} · ${esc(g.yazar)}, ${esc(g.lisans)} · <a href="${esc(g.kaynak)}" target="_blank" rel="noopener">Wikimedia Commons</a></figcaption></figure>`).join('')}</div>`;
   }
+  // Kitaptaki (Siyer-i Nebî) bölüm adı: dersin başlığının altında küçük satır
+  function bolumSatiri(x) {
+    if (!x.bolum || typeof BOLUMLER === 'undefined') return '';
+    const b = BOLUMLER.find(z => z[0] === x.bolum); if (!b) return '';
+    return `<p class="soluk kucukyazi" style="margin:-6px 0 12px">${T('Bölüm ', 'Chapter ')}${b[0]}: ${esc(T(b[1], b[2]))}</p>`;
+  }
   // Siyer Atlası görselleri (ATLAS boşsa hiçbir şey çizilmez)
   function atlas(id) {
     const A = (typeof ATLAS !== 'undefined' && ATLAS[id]) || []; if (!A.length) return '';
@@ -196,7 +202,7 @@
       <section class="kart" style="margin-bottom:0"><b>${bitti} / ${tum}</b> ${T('ders tamamlandı', 'lessons completed')}<div class="ilerle" role="progressbar" aria-valuenow="${bitti}" aria-valuemax="${tum}"><i style="width:${bitti / tum * 100}%"></i></div></section>
       ${DON.map(d => { const [b, t] = donemOran(d);
         return `<section class="donem" style="--renk:${d.renk}"><h2>${esc(d.ad)}<small>${esc(d.alt)} · ${T(b + '/' + t + ' ders', b + '/' + t + ' lessons')}</small></h2><div class="yol">${d.dersler.map(x => { no++;
-          return `<div class="dugum ${gecti(x.id) ? 'bitti' : ''} ${sira && sira.x.id === x.id ? 'sirada' : ''}"><button data-ders="${x.id}" ${sira && sira.x.id === x.id ? 'aria-label="' + esc(x.baslik) + T(', sıradaki ders', ', next lesson') + '"' : ''}><span class="no">${gecti(x.id) ? IKON.tik.replace('width="24" height="24"', 'width="18" height="18"') : no}</span><span class="t">${esc(x.baslik)}<em>${esc(x.yil)}</em></span></button></div>`; }).join('')}</div></section>`; }).join('')}
+          return `<div class="dugum ${gecti(x.id) ? 'bitti' : ''} ${sira && sira.x.id === x.id ? 'sirada' : ''}"><button data-ders="${x.id}" ${sira && sira.x.id === x.id ? 'aria-label="' + esc(x.baslik) + T(', sıradaki ders', ', next lesson') + '"' : ''}><span class="no">${gecti(x.id) ? IKON.tik.replace('width="24" height="24"', 'width="18" height="18"') : no}</span><span class="t">${esc(x.baslik)}<em>${esc(x.yil)}${x.bolum ? ' · ' + T('Bölüm ', 'Ch. ') + x.bolum : ''}</em></span></button></div>`; }).join('')}</div></section>`; }).join('')}
     </main>`;
     modBagla(); app.querySelectorAll('[data-ders]').forEach(b => b.onclick = () => git('ders', b.dataset.ders));
     const s = $('.dugum.sirada'); if (s && !EKRAN.yol._kaydirildi) { EKRAN.yol._kaydirildi = 1; setTimeout(() => s.scrollIntoView({ block: 'center' }), 0); }
@@ -206,7 +212,7 @@
     const e = ders(id); if (!e) return geri();
     const { d, x } = e, v = x[S.mod] || x.buyuk, dt = (typeof DET !== 'undefined' && DET[id]) || {}, sn = sonraki(id);
     app.innerHTML = `${ust(d.ad, true)}<main style="--renk:${d.renk}">
-      <span class="chip">${esc(x.yil)}</span><h2 class="ders-baslik">${esc(x.baslik)}</h2>
+      <span class="chip">${esc(x.yil)}</span><h2 class="ders-baslik">${esc(x.baslik)}</h2>${bolumSatiri(x)}
       <div class="ozet">${esc(v.ozet)}</div>${harita(id)}${gorsel(id)}${atlas(id)}
       <div class="zaman">${v.olaylar.map(o => `<div class="olay"><b>${o.e ? `<span aria-hidden="true">${o.e}</span>` : ''}${esc(o.b)}</b>${esc(o.m)}${o.k ? `<div class="kaynak">${T('Kaynak', 'Source')}: ${esc(o.k)}</div>` : ''}</div>`).join('')}</div>
       <details class="detay" ${cocuk() ? '' : 'open'}><summary>${ik('kitap')} ${T(cocuk() ? 'Daha çok öğren' : 'Daha fazla bilgi', cocuk() ? 'Learn more' : 'More information')}</summary>
